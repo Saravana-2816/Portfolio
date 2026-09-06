@@ -6,8 +6,11 @@ export const site = {
     "RAG & LLM Builder",
     "Aspiring System Design Architect",
   ],
-  tagline:
-    "I build full-stack products end-to-end — and the intelligence that powers them.",
+  introLines: [
+    "An engineer by profession, but a learner by nature.",
+    "I believe growth begins when you become comfortable being uncomfortable.",
+    "Always learning, always building, and always curious about what lies beyond what I already know.",
+  ],
   email: "saravana28092004@gmail.com",
   phone: "+91 76399 24552",
   linkedin: "https://www.linkedin.com/in/saravanakumar-ks-548861257/",

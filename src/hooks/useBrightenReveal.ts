@@ -12,15 +12,15 @@ export function useBrightenReveal<T extends HTMLElement>() {
       if (reducedMotion || !ref.current) return
       gsap.fromTo(
         ref.current,
-        { opacity: 0.35 },
+        { opacity: 0.3 },
         {
           opacity: 1,
-          duration: 0.6,
-          ease: "power2.out",
+          ease: "none",
           scrollTrigger: {
             trigger: ref.current,
-            start: "top 82%",
-            once: true,
+            start: "top 95%",
+            end: "top 55%",
+            scrub: 0.3,
           },
         }
       )

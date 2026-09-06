@@ -67,7 +67,7 @@ export function CodePanel() {
         className="glass-panel overflow-hidden rounded-xl"
         style={{ transformStyle: "preserve-3d" }}
       >
-        <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-border px-5 py-4">
           {trafficLights.map((light) => (
             <span
               key={light.label}
@@ -78,10 +78,10 @@ export function CodePanel() {
           ))}
           <span className="ml-2 font-mono text-[11px] text-muted-foreground">about.json</span>
         </div>
-        <pre className="overflow-x-auto p-5 font-mono text-[12px] leading-[1.55] text-foreground">
+        <pre className="overflow-x-auto p-6 font-mono text-sm leading-[1.9] text-foreground">
           <code>
             {jsonLines.join("\n")}
-            <span className="ml-0.5 inline-block h-3 w-1.5 translate-y-0.5 bg-foreground motion-safe:animate-pulse" />
+            <span className="ml-0.5 inline-block h-3.5 w-1.5 translate-y-0.5 bg-foreground motion-safe:animate-pulse" />
           </code>
         </pre>
       </div>

@@ -4,6 +4,7 @@ import { GitHubIcon, LinkedInIcon } from "@/components/icons/BrandIcons"
 import { useGSAP } from "@gsap/react"
 import { gsap, SplitText } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
+import { useTheme } from "@/hooks/useTheme"
 import { site } from "@/data/site"
 import { projects } from "@/data/projects"
 import { Button } from "@/components/ui/button"
@@ -21,31 +22,15 @@ const socials = [
   { label: "Email", href: `mailto:${site.email}`, icon: Mail },
 ]
 
-function useReplayOnRefocus() {
-  const [replayKey, setReplayKey] = React.useState(0)
-
-  React.useEffect(() => {
-    function onVisibility() {
-      if (document.visibilityState === "visible") {
-        setReplayKey((k) => k + 1)
-      }
-    }
-    document.addEventListener("visibilitychange", onVisibility)
-    return () => document.removeEventListener("visibilitychange", onVisibility)
-  }, [])
-
-  return replayKey
-}
-
 export function Hero() {
   const reducedMotion = useReducedMotion()
-  const replayKey = useReplayOnRefocus()
+  const { theme } = useTheme()
   const rootRef = React.useRef<HTMLDivElement>(null)
   const leadRef = React.useRef<HTMLParagraphElement>(null)
   const nameRef = React.useRef<HTMLHeadingElement>(null)
   const roleRef = React.useRef<HTMLParagraphElement>(null)
-  const taglineRef = React.useRef<HTMLParagraphElement>(null)
-  const factsRef = React.useRef<HTMLDivElement>(null)
+  const introRef = React.useRef<HTMLDivElement>(null)
+  const factsRef = React.useRef<HTMLParagraphElement>(null)
   const ctaRef = React.useRef<HTMLDivElement>(null)
   const socialRef = React.useRef<HTMLDivElement>(null)
   const statRef = React.useRef<HTMLDivElement>(null)
@@ -56,7 +41,7 @@ export function Hero() {
       const targets = [
         leadRef.current,
         roleRef.current,
-        taglineRef.current,
+        introRef.current,
         factsRef.current,
         ctaRef.current,
         socialRef.current,
@@ -98,7 +83,7 @@ export function Hero() {
         )
       }
     },
-    { scope: rootRef, dependencies: [reducedMotion, replayKey] }
+    { scope: rootRef, dependencies: [reducedMotion, theme] }
   )
 
   return (
@@ -120,8 +105,7 @@ export function Hero() {
           className="mt-3 font-heading font-extrabold uppercase leading-[0.88] tracking-tight opacity-0"
           style={{ fontSize: "clamp(1.75rem, 8vw, 6.5rem)" }}
         >
-          <span className="block">Saravanakumar</span>
-          <span className="block">KS</span>
+          Saravanakumar
         </h1>
 
         <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start lg:gap-8">
@@ -129,18 +113,22 @@ export function Hero() {
             <p ref={roleRef} className="text-xl font-medium sm:text-2xl">
               <RotatingRole roles={site.roles} />
             </p>
-            <p ref={taglineRef} className="mt-3 max-w-[52ch] text-base text-muted-foreground sm:text-lg">
-              {site.tagline}
-            </p>
 
-            <div ref={factsRef} className="mt-4 space-y-1.5">
-              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                Chennai, India · B.Tech, AI &amp; ML
-              </p>
-              <p className="max-w-[46ch] font-heading text-base italic text-foreground/90 sm:text-lg">
-                &ldquo;Be better than yesterday.&rdquo;
-              </p>
+            <div
+              ref={introRef}
+              className="mt-3 max-w-[54ch] space-y-1.5 text-base text-muted-foreground sm:text-lg"
+            >
+              {site.introLines.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
             </div>
+
+            <p
+              ref={factsRef}
+              className="mt-4 font-mono text-xs uppercase tracking-widest text-muted-foreground"
+            >
+              Chennai, India · B.Tech, AI &amp; ML
+            </p>
 
             <div ref={ctaRef} className="mt-6 flex flex-wrap gap-4">
               <Button size="lg" onClick={() => scrollToSection("projects")}>
