@@ -20,7 +20,7 @@ export function RotatingRole({ roles }: { roles: readonly string[] }) {
     gsap.fromTo(
       textRef.current,
       { opacity: 0, y: 8 },
-      { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }
+      { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", clearProps: "transform" }
     )
   }, [index, reducedMotion])
 

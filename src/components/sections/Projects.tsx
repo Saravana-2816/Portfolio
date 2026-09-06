@@ -18,7 +18,7 @@ export function Projects() {
           <article
             key={project.title}
             tabIndex={0}
-            className="group relative flex min-h-[220px] flex-col overflow-hidden border border-border bg-card p-6 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="group relative flex min-h-[220px] flex-col border border-border bg-card p-6 transition-colors hover:border-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -41,16 +41,12 @@ export function Projects() {
             </div>
 
             {project.status && (
-              <p className="mt-1 text-xs text-muted-foreground transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0">
-                {project.status}
-              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{project.status}</p>
             )}
 
-            <div className="relative mt-4 flex-1">
-              <p className="max-w-[60ch] text-sm text-muted-foreground opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 sm:text-base translate-y-2">
-                {project.description}
-              </p>
-            </div>
+            <p className="mt-4 max-w-[60ch] flex-1 text-sm text-muted-foreground sm:text-base">
+              {project.description}
+            </p>
 
             <div className="mt-4 flex flex-wrap gap-2">
               {project.tags.map((tag) => (

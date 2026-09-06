@@ -17,7 +17,7 @@ function App() {
     <ThemeProvider>
       <TooltipProvider>
         <Navbar />
-        <main>
+        <main className="isolate">
           <Hero />
           <About />
           <Experience />

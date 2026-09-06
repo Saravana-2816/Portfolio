@@ -22,6 +22,7 @@ export function SectionHeading({ index, title, description, align = "left" }: Se
         y: 24,
         duration: 0.7,
         ease: "power2.out",
+        clearProps: "transform",
         scrollTrigger: {
           trigger: ref.current,
           start: "top 85%",

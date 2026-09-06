@@ -95,12 +95,12 @@
 }
 
 .dark {
-  --ink: #000000;
+  --ink: #07080d;
   --paper: #f2f0eb;
-  --panel: #0a0a0a;
-  --line: #232323;
+  --panel: #10121a;
+  --line: #22242e;
   --text: #f2f0eb;
-  --muted-text: #8a8780;
+  --muted-text: #8b8d99;
 
   --background: var(--ink);
   --foreground: var(--text);
@@ -117,7 +117,7 @@
   --accent: var(--panel);
   --accent-foreground: var(--text);
   --destructive: #e05a43;
-  --destructive-foreground: #000000;
+  --destructive-foreground: var(--ink);
   --border: var(--line);
   --input: var(--line);
   --ring: var(--text);
