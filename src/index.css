@@ -5,8 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -33,15 +34,11 @@
   --color-paper: var(--paper);
   --color-panel: var(--panel);
   --color-line: var(--line);
-  --color-signal: var(--signal);
-  --color-pulse: var(--pulse);
-  --color-text: var(--text);
-  --color-muted-text: var(--muted-text);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: 0rem;
+  --radius-md: 0rem;
+  --radius-lg: 0rem;
+  --radius-xl: 0rem;
 
   --animate-fade-in: fade-in 0.6s ease-out both;
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -67,16 +64,14 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0rem;
 
-  --ink: #0b1220;
-  --paper: #f7f9fc;
-  --panel: #ffffff;
-  --line: #e2e8f0;
-  --signal: #0284c7;
-  --pulse: #7c3aed;
-  --text: #0f172a;
-  --muted-text: #55617a;
+  --ink: #000000;
+  --paper: #f2f0eb;
+  --panel: #fbfaf7;
+  --line: #e3e0d9;
+  --text: #14130f;
+  --muted-text: #6b6862;
 
   --background: var(--paper);
   --foreground: var(--text);
@@ -84,30 +79,28 @@
   --card-foreground: var(--text);
   --popover: var(--panel);
   --popover-foreground: var(--text);
-  --primary: var(--signal);
-  --primary-foreground: #f7f9fc;
+  --primary: var(--text);
+  --primary-foreground: var(--paper);
   --secondary: var(--panel);
   --secondary-foreground: var(--text);
-  --muted: color-mix(in srgb, var(--line) 45%, var(--paper));
+  --muted: color-mix(in srgb, var(--line) 55%, var(--paper));
   --muted-foreground: var(--muted-text);
-  --accent: var(--pulse);
-  --accent-foreground: #ffffff;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
+  --accent: var(--panel);
+  --accent-foreground: var(--text);
+  --destructive: #a3311f;
+  --destructive-foreground: #f2f0eb;
   --border: var(--line);
   --input: var(--line);
-  --ring: var(--signal);
+  --ring: var(--text);
 }
 
 .dark {
-  --ink: #0b1220;
-  --paper: #f7f9fc;
-  --panel: #121b2e;
-  --line: #1e293b;
-  --signal: #38bdf8;
-  --pulse: #8b5cf6;
-  --text: #e5e9f0;
-  --muted-text: #8b95a7;
+  --ink: #000000;
+  --paper: #f2f0eb;
+  --panel: #0a0a0a;
+  --line: #232323;
+  --text: #f2f0eb;
+  --muted-text: #8a8780;
 
   --background: var(--ink);
   --foreground: var(--text);
@@ -115,19 +108,19 @@
   --card-foreground: var(--text);
   --popover: var(--panel);
   --popover-foreground: var(--text);
-  --primary: var(--signal);
+  --primary: var(--text);
   --primary-foreground: var(--ink);
   --secondary: var(--panel);
   --secondary-foreground: var(--text);
-  --muted: color-mix(in srgb, var(--line) 65%, var(--ink));
+  --muted: color-mix(in srgb, var(--line) 70%, var(--ink));
   --muted-foreground: var(--muted-text);
-  --accent: var(--pulse);
-  --accent-foreground: #f7f9fc;
-  --destructive: #f87171;
-  --destructive-foreground: #0b1220;
+  --accent: var(--panel);
+  --accent-foreground: var(--text);
+  --destructive: #e05a43;
+  --destructive-foreground: #000000;
   --border: var(--line);
   --input: var(--line);
-  --ring: var(--signal);
+  --ring: var(--text);
 }
 
 @layer base {
@@ -149,20 +142,14 @@
     @apply font-heading;
   }
   ::selection {
-    background: color-mix(in srgb, var(--signal) 30%, transparent);
-    color: var(--text);
+    background: var(--text);
+    color: var(--background);
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
-  }
-  .gradient-text {
-    background-image: linear-gradient(90deg, var(--signal), var(--pulse));
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
   }
 }
 

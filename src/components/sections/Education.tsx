@@ -40,7 +40,7 @@ export function Education() {
 
   return (
     <Section id="education">
-      <SectionHeading title="Education" />
+      <SectionHeading index={5} title="Education" />
 
       <div ref={containerRef} className="relative mt-10 pl-8 sm:pl-10">
         <div className="absolute top-1 left-[3px] h-full w-px border-l border-dashed border-border sm:left-[7px]" />

@@ -4,12 +4,13 @@ import { gsap } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
 
 type SectionHeadingProps = {
+  index: number
   title: string
   description?: string
   align?: "left" | "center"
 }
 
-export function SectionHeading({ title, description, align = "left" }: SectionHeadingProps) {
+export function SectionHeading({ index, title, description, align = "left" }: SectionHeadingProps) {
   const ref = React.useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
 
@@ -33,7 +34,12 @@ export function SectionHeading({ title, description, align = "left" }: SectionHe
 
   return (
     <div ref={ref} className={align === "center" ? "text-center" : "text-left"}>
-      <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h2>
+      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+        {String(index).padStart(2, "0")}
+      </p>
+      <h2 className="mt-2 font-heading text-4xl font-extrabold uppercase leading-[0.95] tracking-tight sm:text-5xl">
+        {title}
+      </h2>
       {description && (
         <p
           className={

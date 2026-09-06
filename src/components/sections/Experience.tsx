@@ -42,6 +42,7 @@ export function Experience() {
   return (
     <Section id="experience">
       <SectionHeading
+        index={2}
         title="Experience"
         description="Most recent first — building across the stack, with a growing DevOps footprint."
       />
@@ -50,13 +51,13 @@ export function Experience() {
         <div className="absolute top-1 left-[3px] h-full w-px bg-border sm:left-[7px]" />
         <div
           ref={railRef}
-          className="absolute top-1 left-[3px] h-full w-px origin-top bg-gradient-to-b from-signal to-pulse sm:left-[7px]"
+          className="absolute top-1 left-[3px] h-full w-px origin-top bg-foreground sm:left-[7px]"
         />
 
         <div className="flex flex-col gap-10">
           {experience.map((item) => (
             <div key={item.company} className="relative">
-              <span className="absolute top-1.5 -left-8 size-2.5 rounded-full bg-signal ring-4 ring-background sm:-left-10" />
+              <span className="absolute top-1.5 -left-8 size-2.5 bg-foreground ring-4 ring-background sm:-left-10" />
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                 <h3 className="font-heading text-lg font-semibold">
                   {item.role} · {item.company}
@@ -75,7 +76,7 @@ export function Experience() {
               </ul>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.tools.map((tool) => (
-                  <Badge key={tool} variant="secondary" className="font-normal">
+                  <Badge key={tool} variant="outline" className="font-mono text-xs font-normal">
                     {tool}
                   </Badge>
                 ))}

@@ -5,13 +5,10 @@ import { useGSAP } from "@gsap/react"
 import { gsap, SplitText } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
 import { site } from "@/data/site"
+import { projects } from "@/data/projects"
 import { Button } from "@/components/ui/button"
 import { RotatingRole } from "@/components/sections/hero/RotatingRole"
 import { ScrollCue } from "@/components/sections/hero/ScrollCue"
-
-const Scene = React.lazy(() =>
-  import("@/components/three/Scene").then((m) => ({ default: m.Scene }))
-)
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -32,7 +29,7 @@ export function Hero() {
   const taglineRef = React.useRef<HTMLParagraphElement>(null)
   const ctaRef = React.useRef<HTMLDivElement>(null)
   const socialRef = React.useRef<HTMLDivElement>(null)
-  const sceneWrapRef = React.useRef<HTMLDivElement>(null)
+  const statRef = React.useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
@@ -42,10 +39,11 @@ export function Hero() {
         taglineRef.current,
         ctaRef.current,
         socialRef.current,
+        statRef.current,
       ].filter(Boolean)
 
       if (reducedMotion) {
-        gsap.set([...targets, nameRef.current, sceneWrapRef.current], { opacity: 1 })
+        gsap.set([...targets, nameRef.current], { opacity: 1, filter: "none" })
         return
       }
 
@@ -56,9 +54,10 @@ export function Hero() {
         tl.set(nameRef.current, { opacity: 1 })
         tl.from(split.chars, {
           opacity: 0,
-          y: 24,
-          stagger: 0.02,
-          duration: 0.6,
+          y: 60,
+          filter: "blur(14px)",
+          stagger: 0.015,
+          duration: 0.9,
         })
       }
 
@@ -67,16 +66,8 @@ export function Hero() {
       }
 
       targets.slice(1).forEach((el, i) => {
-        tl.from(el, { opacity: 0, y: 18, duration: 0.55 }, 0.25 + i * 0.12)
+        tl.from(el, { opacity: 0, y: 18, duration: 0.55 }, 0.35 + i * 0.1)
       })
-
-      if (sceneWrapRef.current) {
-        tl.from(
-          sceneWrapRef.current,
-          { opacity: 0, scale: 0.92, duration: 1 },
-          0.1
-        )
-      }
     },
     { scope: rootRef, dependencies: [reducedMotion] }
   )
@@ -85,62 +76,65 @@ export function Hero() {
     <section
       id="hero"
       ref={rootRef}
-      className="relative flex min-h-[100svh] items-center overflow-hidden"
+      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden border-b border-border pt-24 pb-10"
     >
-      <div className="mx-auto grid w-full max-w-[1600px] grid-cols-1 items-center gap-10 px-4 pt-28 pb-20 sm:px-6 lg:grid-cols-2 lg:gap-6 lg:pt-24 lg:pb-16">
-        <div className="relative z-10 order-2 max-w-xl lg:order-1 lg:pl-[max(0px,calc((100vw-1120px)/2))]">
-          <p ref={leadRef} className="text-sm font-medium text-muted-foreground">
-            Hi, I&apos;m
-          </p>
-          <h1
-            ref={nameRef}
-            className="mt-2 gradient-text text-balance font-heading text-4xl font-semibold tracking-tight opacity-0 sm:text-5xl lg:text-6xl"
-          >
-            {site.name}
-          </h1>
-          <p ref={roleRef} className="mt-4 text-xl font-medium sm:text-2xl">
-            <RotatingRole roles={site.roles} />
-          </p>
-          <p ref={taglineRef} className="mt-5 max-w-[52ch] text-base text-muted-foreground sm:text-lg">
-            {site.tagline}
-          </p>
+      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6">
+        <p ref={leadRef} className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+          Hi, I&apos;m
+        </p>
 
-          <div ref={ctaRef} className="mt-8 flex flex-wrap gap-3">
-            <Button size="lg" onClick={() => scrollToSection("projects")}>
-              View My Work
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => scrollToSection("connect")}>
-              Let&apos;s Connect
-            </Button>
-          </div>
+        <h1
+          ref={nameRef}
+          className="mt-4 font-heading font-extrabold uppercase leading-[0.88] tracking-tight opacity-0"
+          style={{ fontSize: "clamp(1.75rem, 9.5vw, 8.5rem)" }}
+        >
+          <span className="block">Saravanakumar</span>
+          <span className="block">KS</span>
+        </h1>
 
-          <div ref={socialRef} className="mt-8 flex items-center gap-3">
-            {socials.map(({ label, href, icon: Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target={href.startsWith("http") ? "_blank" : undefined}
-                rel={href.startsWith("http") ? "noreferrer" : undefined}
-                aria-label={label}
-                className="flex size-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-signal hover:text-signal"
-              >
-                <Icon className="size-4" />
-              </a>
-            ))}
-          </div>
+        <p ref={roleRef} className="mt-6 text-xl font-medium sm:text-2xl">
+          <RotatingRole roles={site.roles} />
+        </p>
+        <p ref={taglineRef} className="mt-4 max-w-[52ch] text-base text-muted-foreground sm:text-lg">
+          {site.tagline}
+        </p>
+
+        <div ref={ctaRef} className="mt-9 flex flex-wrap gap-4">
+          <Button size="lg" onClick={() => scrollToSection("projects")}>
+            View My Work
+          </Button>
+          <Button size="lg" variant="outline" onClick={() => scrollToSection("connect")}>
+            Let&apos;s Connect
+          </Button>
         </div>
 
-        <div
-          ref={sceneWrapRef}
-          className="relative order-1 h-[300px] sm:h-[400px] lg:order-2 lg:h-[560px] xl:h-[620px]"
-        >
-          <React.Suspense fallback={null}>
-            <Scene />
-          </React.Suspense>
+        <div ref={socialRef} className="mt-8 flex items-center gap-3">
+          {socials.map(({ label, href, icon: Icon }) => (
+            <a
+              key={label}
+              href={href}
+              target={href.startsWith("http") ? "_blank" : undefined}
+              rel={href.startsWith("http") ? "noreferrer" : undefined}
+              aria-label={label}
+              className="flex size-10 items-center justify-center border border-border text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+            >
+              <Icon className="size-4" />
+            </a>
+          ))}
         </div>
       </div>
 
-      <ScrollCue />
+      <div className="mx-auto mt-16 flex w-full max-w-[1400px] items-end justify-between px-4 sm:px-6">
+        <ScrollCue />
+        <div ref={statRef} className="text-right">
+          <p className="font-heading text-5xl font-extrabold leading-none sm:text-6xl">
+            {String(projects.length).padStart(2, "0")}
+          </p>
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+            Projects shipped
+          </p>
+        </div>
+      </div>
     </section>
   )
 }

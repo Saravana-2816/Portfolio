@@ -19,9 +19,7 @@ export function Footer() {
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[1120px] flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-start md:justify-between">
         <div className="max-w-xs space-y-3">
-          <p className="font-heading text-base font-semibold">
-            Saravanakumar<span className="text-signal">.</span>
-          </p>
+          <p className="font-heading text-base font-semibold">Saravanakumar.</p>
           <p className="text-sm text-muted-foreground">
             Full-Stack Developer &amp; AI Engineer, building systems that ship and scale.
           </p>
@@ -52,7 +50,7 @@ export function Footer() {
                 target={href.startsWith("http") ? "_blank" : undefined}
                 rel={href.startsWith("http") ? "noreferrer" : undefined}
                 aria-label={label}
-                className="flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-signal hover:text-signal"
+                className="flex size-9 items-center justify-center border border-border text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
               >
                 <Icon className="size-4" />
               </a>
@@ -64,7 +62,7 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-[1120px] flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p>© {year} Saravanakumar KS. All rights reserved.</p>
-          <p>Built with React, Three.js &amp; GSAP.</p>
+          <p>Built with React &amp; GSAP.</p>
         </div>
       </div>
     </footer>

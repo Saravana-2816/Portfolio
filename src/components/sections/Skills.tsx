@@ -6,15 +6,17 @@ import { Badge } from "@/components/ui/badge"
 export function Skills() {
   return (
     <Section id="skills">
-      <SectionHeading title="Skills" />
+      <SectionHeading index={4} title="Skills" />
 
       <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2">
         {skills.map((group) => (
           <div key={group.category}>
-            <h3 className="text-sm font-medium text-muted-foreground">{group.category}</h3>
+            <h3 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              {group.category}
+            </h3>
             <div className="mt-3 flex flex-wrap gap-2">
               {group.items.map((item) => (
-                <Badge key={item} variant="secondary" className="font-normal">
+                <Badge key={item} variant="outline" className="font-mono text-xs font-normal">
                   {item}
                 </Badge>
               ))}

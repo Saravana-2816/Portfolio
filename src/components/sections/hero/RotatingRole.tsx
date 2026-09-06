@@ -25,10 +25,7 @@ export function RotatingRole({ roles }: { roles: readonly string[] }) {
   }, [index, reducedMotion])
 
   return (
-    <span
-      ref={textRef}
-      className="bg-gradient-to-r from-signal to-pulse bg-clip-text text-transparent"
-    >
+    <span ref={textRef} className="text-muted-foreground">
       {roles[index]}
     </span>
   )

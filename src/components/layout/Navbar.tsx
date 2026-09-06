@@ -40,7 +40,7 @@ export function Navbar() {
           onClick={() => scrollToSection("hero")}
           className="font-heading text-sm font-semibold tracking-tight"
         >
-          Saravanakumar<span className="text-signal">.</span>
+          Saravanakumar.
         </button>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -49,7 +49,7 @@ export function Navbar() {
               key={link.id}
               onClick={() => scrollToSection(link.id)}
               className={cn(
-                "relative rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "relative px-3 py-2 font-mono text-xs uppercase tracking-widest transition-colors",
                 activeId === link.id
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -57,7 +57,7 @@ export function Navbar() {
             >
               {link.label}
               {activeId === link.id && (
-                <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-gradient-to-r from-signal to-pulse" />
+                <span className="absolute inset-x-2 -bottom-px h-px bg-foreground" />
               )}
             </button>
           ))}
@@ -90,7 +90,7 @@ export function Navbar() {
                       scrollToSection(link.id)
                     }}
                     className={cn(
-                      "rounded-md px-3 py-2 text-left text-base font-medium transition-colors",
+                      "px-3 py-2 text-left font-mono text-sm uppercase tracking-widest transition-colors",
                       activeId === link.id
                         ? "bg-secondary text-foreground"
                         : "text-muted-foreground hover:text-foreground"
@@ -103,7 +103,7 @@ export function Navbar() {
                   href={site.resumeHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-md px-3 py-2 text-left text-base font-medium text-muted-foreground hover:text-foreground"
+                  className="px-3 py-2 text-left font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
                   onClick={() => setSheetOpen(false)}
                 >
                   Resume

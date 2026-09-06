@@ -49,15 +49,17 @@ function StatCard({ stat }: { stat: (typeof stats)[number] }) {
   )
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
-      <p className="font-heading text-3xl font-semibold text-signal">
+    <div className="border-t border-border pt-4">
+      <p className="font-heading text-4xl font-extrabold leading-none sm:text-5xl">
         {stat.display ?? (
           <span ref={ref}>
             0{stat.suffix}
           </span>
         )}
       </p>
-      <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
+      <p className="mt-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+        {stat.label}
+      </p>
     </div>
   )
 }
@@ -65,7 +67,7 @@ function StatCard({ stat }: { stat: (typeof stats)[number] }) {
 export function About() {
   return (
     <Section id="about">
-      <SectionHeading title="About" />
+      <SectionHeading index={1} title="About" />
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr]">
         <p className="max-w-[75ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
           {bio}

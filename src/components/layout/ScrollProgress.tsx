@@ -26,7 +26,7 @@ export function ScrollProgress() {
     <div className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden bg-transparent">
       <div
         ref={barRef}
-        className="h-full bg-gradient-to-r from-signal to-pulse transition-[width] duration-150 ease-out"
+        className="h-full bg-foreground transition-[width] duration-150 ease-out"
         style={{ width: "0%" }}
       />
     </div>
