@@ -21,13 +21,31 @@ const socials = [
   { label: "Email", href: `mailto:${site.email}`, icon: Mail },
 ]
 
+function useReplayOnRefocus() {
+  const [replayKey, setReplayKey] = React.useState(0)
+
+  React.useEffect(() => {
+    function onVisibility() {
+      if (document.visibilityState === "visible") {
+        setReplayKey((k) => k + 1)
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibility)
+    return () => document.removeEventListener("visibilitychange", onVisibility)
+  }, [])
+
+  return replayKey
+}
+
 export function Hero() {
   const reducedMotion = useReducedMotion()
+  const replayKey = useReplayOnRefocus()
   const rootRef = React.useRef<HTMLDivElement>(null)
   const leadRef = React.useRef<HTMLParagraphElement>(null)
   const nameRef = React.useRef<HTMLHeadingElement>(null)
   const roleRef = React.useRef<HTMLParagraphElement>(null)
   const taglineRef = React.useRef<HTMLParagraphElement>(null)
+  const factsRef = React.useRef<HTMLDivElement>(null)
   const ctaRef = React.useRef<HTMLDivElement>(null)
   const socialRef = React.useRef<HTMLDivElement>(null)
   const statRef = React.useRef<HTMLDivElement>(null)
@@ -39,6 +57,7 @@ export function Hero() {
         leadRef.current,
         roleRef.current,
         taglineRef.current,
+        factsRef.current,
         ctaRef.current,
         socialRef.current,
         statRef.current,
@@ -68,50 +87,62 @@ export function Hero() {
       }
 
       targets.slice(1).forEach((el, i) => {
-        tl.from(el, { opacity: 0, y: 18, duration: 0.55, clearProps: "transform" }, 0.35 + i * 0.1)
+        tl.from(el, { opacity: 0, y: 18, duration: 0.55, clearProps: "transform" }, 0.3 + i * 0.09)
       })
 
       if (panelRef.current) {
         tl.from(
           panelRef.current,
           { opacity: 0, y: 24, duration: 0.7, clearProps: "transform" },
-          0.5
+          0.45
         )
       }
     },
-    { scope: rootRef, dependencies: [reducedMotion] }
+    { scope: rootRef, dependencies: [reducedMotion, replayKey] }
   )
 
   return (
     <section
       id="hero"
       ref={rootRef}
-      className="relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden border-b border-border pt-24 pb-10"
+      className="relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden border-b border-border pt-20 pb-6"
     >
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6">
-        <p ref={leadRef} className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+        <p
+          ref={leadRef}
+          className="font-mono text-sm font-medium uppercase tracking-[0.25em] text-foreground/80 sm:text-base"
+        >
           Hi, I&apos;m
         </p>
 
         <h1
           ref={nameRef}
-          className="mt-4 font-heading font-extrabold uppercase leading-[0.88] tracking-tight opacity-0"
-          style={{ fontSize: "clamp(1.75rem, 8vw, 7.25rem)" }}
+          className="mt-3 font-heading font-extrabold uppercase leading-[0.88] tracking-tight opacity-0"
+          style={{ fontSize: "clamp(1.75rem, 8vw, 6.5rem)" }}
         >
           <span className="block">Saravanakumar</span>
           <span className="block">KS</span>
         </h1>
 
-        <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1.3fr_1fr] lg:items-start lg:gap-8">
+        <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start lg:gap-8">
           <div>
             <p ref={roleRef} className="text-xl font-medium sm:text-2xl">
               <RotatingRole roles={site.roles} />
             </p>
-            <p ref={taglineRef} className="mt-4 max-w-[52ch] text-base text-muted-foreground sm:text-lg">
+            <p ref={taglineRef} className="mt-3 max-w-[52ch] text-base text-muted-foreground sm:text-lg">
               {site.tagline}
             </p>
 
-            <div ref={ctaRef} className="mt-9 flex flex-wrap gap-4">
+            <div ref={factsRef} className="mt-4 space-y-1.5">
+              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                Chennai, India · B.Tech, AI &amp; ML
+              </p>
+              <p className="max-w-[46ch] font-heading text-base italic text-foreground/90 sm:text-lg">
+                &ldquo;Be better than yesterday.&rdquo;
+              </p>
+            </div>
+
+            <div ref={ctaRef} className="mt-6 flex flex-wrap gap-4">
               <Button size="lg" onClick={() => scrollToSection("projects")}>
                 View My Work
               </Button>
@@ -120,7 +151,7 @@ export function Hero() {
               </Button>
             </div>
 
-            <div ref={socialRef} className="mt-8 flex items-center gap-3">
+            <div ref={socialRef} className="mt-5 flex items-center gap-3">
               {socials.map(({ label, href, icon: Icon }) => (
                 <a
                   key={label}
@@ -142,10 +173,10 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="mx-auto mt-16 flex w-full max-w-[1400px] items-end justify-between px-4 sm:px-6">
+      <div className="mx-auto mt-8 flex w-full max-w-[1400px] items-end justify-between px-4 sm:px-6">
         <ScrollCue />
         <div ref={statRef} className="text-right">
-          <p className="font-heading text-5xl font-extrabold leading-none sm:text-6xl">
+          <p className="font-heading text-4xl font-extrabold leading-none sm:text-5xl">
             {String(projects.length).padStart(2, "0")}
           </p>
           <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">

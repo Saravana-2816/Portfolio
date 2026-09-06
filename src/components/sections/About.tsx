@@ -2,6 +2,7 @@ import * as React from "react"
 import { useGSAP } from "@gsap/react"
 import { gsap } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
+import { useBrightenReveal } from "@/hooks/useBrightenReveal"
 import { Section } from "@/components/layout/Section"
 import { SectionHeading } from "@/components/layout/SectionHeading"
 
@@ -65,11 +66,16 @@ function StatCard({ stat }: { stat: (typeof stats)[number] }) {
 }
 
 export function About() {
+  const bioRef = useBrightenReveal<HTMLParagraphElement>()
+
   return (
     <Section id="about">
       <SectionHeading index={1} title="About" />
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr]">
-        <p className="max-w-[75ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
+        <p
+          ref={bioRef}
+          className="max-w-[75ch] text-base leading-relaxed text-muted-foreground sm:text-lg"
+        >
           {bio}
         </p>
         <div className="grid grid-cols-2 gap-4">

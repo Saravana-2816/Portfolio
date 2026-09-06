@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { BackToTop } from "@/components/layout/BackToTop"
+import { CustomCursor } from "@/components/layout/CustomCursor"
 import { Hero } from "@/components/sections/Hero"
 import { About } from "@/components/sections/About"
 import { Experience } from "@/components/sections/Experience"
@@ -28,6 +29,7 @@ function App() {
         </main>
         <Footer />
         <BackToTop />
+        <CustomCursor />
         <Toaster />
       </TooltipProvider>
     </ThemeProvider>
