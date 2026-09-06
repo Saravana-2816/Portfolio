@@ -18,7 +18,7 @@ export function Projects() {
           <article
             key={project.title}
             tabIndex={0}
-            className="group relative flex min-h-[220px] flex-col border border-border bg-card p-6 transition-colors hover:border-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="glass-panel glass-panel-hover group relative flex min-h-[220px] flex-col rounded-xl p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <div className="flex items-start justify-between gap-3">
               <div>

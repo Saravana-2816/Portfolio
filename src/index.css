@@ -35,10 +35,10 @@
   --color-panel: var(--panel);
   --color-line: var(--line);
 
-  --radius-sm: 0rem;
-  --radius-md: 0rem;
-  --radius-lg: 0rem;
-  --radius-xl: 0rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 
   --animate-fade-in: fade-in 0.6s ease-out both;
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -64,14 +64,16 @@
 }
 
 :root {
-  --radius: 0rem;
+  --radius: 0.75rem;
 
   --ink: #000000;
   --paper: #f2f0eb;
-  --panel: #fbfaf7;
-  --line: #e3e0d9;
+  --panel: #ffffff;
+  --line: #dedad0;
   --text: #14130f;
   --muted-text: #6b6862;
+  --panel-shadow: 0 12px 32px -14px rgba(20, 19, 15, 0.18), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  --panel-shadow-hover: 0 20px 44px -16px rgba(20, 19, 15, 0.26), 0 1px 0 rgba(255, 255, 255, 0.7) inset;
 
   --background: var(--paper);
   --foreground: var(--text);
@@ -97,10 +99,12 @@
 .dark {
   --ink: #07080d;
   --paper: #f2f0eb;
-  --panel: #10121a;
-  --line: #22242e;
+  --panel: #161822;
+  --line: #2c2f3c;
   --text: #f2f0eb;
   --muted-text: #8b8d99;
+  --panel-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  --panel-shadow-hover: 0 20px 44px -16px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
 
   --background: var(--ink);
   --foreground: var(--text);
@@ -150,6 +154,24 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .glass-panel {
+    background-color: color-mix(in srgb, var(--card) 82%, transparent);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid var(--border);
+    box-shadow: var(--panel-shadow);
+    transition:
+      box-shadow 0.3s ease,
+      border-color 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .glass-panel-hover:hover {
+    border-color: var(--foreground);
+    box-shadow: var(--panel-shadow-hover);
+    transform: translateY(-3px);
   }
 }
 

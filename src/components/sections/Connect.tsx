@@ -71,7 +71,7 @@ export function Connect() {
               href={href}
               target={href.startsWith("http") ? "_blank" : undefined}
               rel={href.startsWith("http") ? "noreferrer" : undefined}
-              className="flex items-center gap-3 border border-border bg-card px-4 py-3 text-sm transition-colors hover:border-foreground hover:text-foreground sm:text-base"
+              className="glass-panel glass-panel-hover flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-colors hover:text-foreground sm:text-base"
             >
               <Icon className="size-4 shrink-0" />
               <span>{label}</span>
@@ -80,19 +80,10 @@ export function Connect() {
         </div>
 
         <div className="relative">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -top-3 -left-3 size-6 border-t-2 border-l-2 border-foreground"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -bottom-3 -right-3 size-6 border-r-2 border-b-2 border-foreground"
-          />
-
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="relative space-y-5 border border-border bg-card p-6"
+              className="glass-panel relative space-y-5 rounded-xl p-6"
             >
               <FormField
                 control={form.control}
