@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)" />
+
+    <title>Saravanakumar KS — Full-Stack Developer &amp; AI Engineer</title>
+    <meta
+      name="description"
+      content="Saravanakumar KS builds full-stack products end-to-end and the intelligence that powers them — RAG pipelines, fine-tuned LLMs, agentic workflows, and systems that scale."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Saravanakumar KS — Full-Stack Developer & AI Engineer" />
+    <meta
+      property="og:description"
+      content="Full-stack products end-to-end, and the intelligence that powers them — RAG pipelines, fine-tuned LLMs, agentic workflows, Kubernetes."
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Saravanakumar KS — Full-Stack Developer & AI Engineer" />
+    <meta
+      name="twitter:description"
+      content="Full-stack products end-to-end, and the intelligence that powers them — RAG pipelines, fine-tuned LLMs, agentic workflows, Kubernetes."
+    />
+
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var theme =
+            stored === "dark" || stored === "light"
+              ? stored
+              : window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light";
+          if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
