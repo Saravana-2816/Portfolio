@@ -34,6 +34,8 @@
   --color-paper: var(--paper);
   --color-panel: var(--panel);
   --color-line: var(--line);
+  --color-teal: var(--teal);
+  --color-gold: var(--gold);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -74,6 +76,8 @@
   --muted-text: #6b6862;
   --panel-shadow: 0 12px 32px -14px rgba(20, 19, 15, 0.18), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
   --panel-shadow-hover: 0 20px 44px -16px rgba(20, 19, 15, 0.26), 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  --teal: #0d9488;
+  --gold: #a16207;
 
   --background: var(--paper);
   --foreground: var(--text);
@@ -105,6 +109,8 @@
   --muted-text: #8b8d99;
   --panel-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
   --panel-shadow-hover: 0 20px 44px -16px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  --teal: #2dd4bf;
+  --gold: #e8b84b;
 
   --background: var(--ink);
   --foreground: var(--text);

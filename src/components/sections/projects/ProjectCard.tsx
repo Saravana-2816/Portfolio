@@ -1,10 +1,12 @@
 import { ExternalLink } from "lucide-react"
+import { cn } from "cn"
 import type { Project } from "@/data/projects"
 import { useBrightenReveal } from "@/hooks/useBrightenReveal"
 import { Badge } from "@/components/ui/badge"
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
   const descriptionRef = useBrightenReveal<HTMLParagraphElement>()
+  const accentColor = index % 2 === 0 ? "text-teal" : "text-gold"
 
   return (
     <article
@@ -13,7 +15,9 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-xs text-muted-foreground">{String(index + 1).padStart(2, "0")}</p>
+          <p className={cn("font-mono text-xs font-medium", accentColor)}>
+            {String(index + 1).padStart(2, "0")}
+          </p>
           <h3 className="mt-1 font-heading text-lg leading-snug font-bold transition-transform duration-300 group-hover:-translate-y-1 group-focus-within:-translate-y-1">
             {project.title}
           </h3>

@@ -2,7 +2,21 @@ import * as React from "react"
 import { gsap } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
 
-export function RotatingRole({ roles }: { roles: readonly string[] }) {
+type Role = { text: string; highlight: string }
+
+function renderRole(role: Role) {
+  const idx = role.text.indexOf(role.highlight)
+  if (idx === -1) return role.text
+  return (
+    <>
+      {role.text.slice(0, idx)}
+      <span className="text-teal">{role.highlight}</span>
+      {role.text.slice(idx + role.highlight.length)}
+    </>
+  )
+}
+
+export function RotatingRole({ roles }: { roles: readonly Role[] }) {
   const [index, setIndex] = React.useState(0)
   const textRef = React.useRef<HTMLSpanElement>(null)
   const reducedMotion = useReducedMotion()
@@ -26,7 +40,7 @@ export function RotatingRole({ roles }: { roles: readonly string[] }) {
 
   return (
     <span ref={textRef} className="text-muted-foreground">
-      {roles[index]}
+      {renderRole(roles[index])}
     </span>
   )
 }

@@ -1,10 +1,10 @@
 export const site = {
   name: "Saravanakumar KS",
   roles: [
-    "Full-Stack Developer",
-    "AI Engineer",
-    "RAG & LLM Builder",
-    "Aspiring System Design Architect",
+    { text: "Full-Stack Developer", highlight: "Full-Stack" },
+    { text: "AI Engineer", highlight: "AI" },
+    { text: "RAG & LLM Builder", highlight: "RAG & LLM" },
+    { text: "Aspiring System Design Architect", highlight: "System Design" },
   ],
   introLines: [
     "An engineer by profession, but a learner by nature.",

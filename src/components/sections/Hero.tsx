@@ -92,6 +92,11 @@ export function Hero() {
       ref={rootRef}
       className="relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden border-b border-border pt-20 pb-6"
     >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-24 -left-24 -z-10 size-[26rem] rounded-full bg-teal/25 blur-[120px]"
+      />
+
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6">
         <p
           ref={leadRef}
