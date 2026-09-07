@@ -1,26 +1,19 @@
 import * as React from "react"
 import { gsap } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
-import { site } from "@/data/site"
-
-const jsonLines = [
-  "{",
-  `  "name": "${site.name}",`,
-  `  "role": "Full-Stack Developer",`,
-  `  "focus": "AI Engineer at heart",`,
-  `  "based_in": "Chennai, India",`,
-  `  "stack": ["React", "Node.js", "Python", "PostgreSQL"],`,
-  `  "currently_building": "RAG pipelines & agentic AI systems",`,
-  `  "interests": ["System Design", "Agentic AI", "Open Source", "Distributed Systems"],`,
-  `  "status": "open_to_opportunities"`,
-  "}",
-]
 
 const trafficLights = [
   { color: "#ff5f57", label: "Close" },
   { color: "#febc2e", label: "Minimize" },
   { color: "#28c840", label: "Maximize" },
 ]
+
+const fields = [
+  { label: "role", value: "Backend / AI Engineer" },
+  { label: "focus", value: "Agentic AI + RAG" },
+]
+
+const whoami = ["engineer", "builder", "problem_solver"]
 
 const MAX_TILT = 8
 
@@ -67,23 +60,54 @@ export function CodePanel() {
         className="glass-panel overflow-hidden rounded-xl"
         style={{ transformStyle: "preserve-3d" }}
       >
-        <div className="flex items-center gap-2 border-b border-border px-5 py-4">
-          {trafficLights.map((light) => (
-            <span
-              key={light.label}
-              aria-hidden
-              className="size-2.5 rounded-full"
-              style={{ backgroundColor: light.color }}
-            />
-          ))}
-          <span className="ml-2 font-mono text-[11px] text-muted-foreground">about.json</span>
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <div className="flex items-center gap-2">
+            {trafficLights.map((light) => (
+              <span
+                key={light.label}
+                aria-hidden
+                className="size-2.5 rounded-full"
+                style={{ backgroundColor: light.color }}
+              />
+            ))}
+            <span className="ml-2 font-mono text-[11px] text-muted-foreground">
+              saravanakumar.system
+            </span>
+          </div>
+          <span className="flex items-center gap-1.5 font-mono text-[10px] font-medium uppercase tracking-wide text-teal">
+            <span className="size-1.5 rounded-full bg-teal motion-safe:animate-pulse" />
+            Online
+          </span>
         </div>
-        <pre className="overflow-x-auto p-6 font-mono text-sm leading-[1.9] text-foreground">
-          <code>
-            {jsonLines.join("\n")}
+
+        <div className="space-y-3 p-5 font-mono text-sm">
+          {fields.map((field) => (
+            <div key={field.label} className="flex items-baseline justify-between gap-4">
+              <span className="text-muted-foreground">{field.label}</span>
+              <span className="text-foreground">{field.value}</span>
+            </div>
+          ))}
+
+          <div>
+            <div className="flex items-baseline justify-between gap-4">
+              <span className="text-muted-foreground">growing</span>
+              <span className="text-teal">82%</span>
+            </div>
+            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-border">
+              <div className="h-full rounded-full bg-teal" style={{ width: "82%" }} />
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-border bg-background/40 p-3.5">
+            <p className="text-muted-foreground">$ whoami</p>
+            {whoami.map((line) => (
+              <p key={line} className="mt-1 text-foreground">
+                &gt; {line}
+              </p>
+            ))}
             <span className="ml-0.5 inline-block h-3.5 w-1.5 translate-y-0.5 bg-foreground motion-safe:animate-pulse" />
-          </code>
-        </pre>
+          </div>
+        </div>
       </div>
     </div>
   )

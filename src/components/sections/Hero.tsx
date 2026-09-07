@@ -6,11 +6,10 @@ import { gsap, SplitText } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
 import { useTheme } from "@/hooks/useTheme"
 import { site } from "@/data/site"
-import { projects } from "@/data/projects"
 import { Button } from "@/components/ui/button"
-import { RotatingRole } from "@/components/sections/hero/RotatingRole"
 import { ScrollCue } from "@/components/sections/hero/ScrollCue"
 import { CodePanel } from "@/components/sections/hero/CodePanel"
+import { AmbientField } from "@/components/sections/hero/AmbientField"
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -28,40 +27,40 @@ export function Hero() {
   const rootRef = React.useRef<HTMLDivElement>(null)
   const leadRef = React.useRef<HTMLParagraphElement>(null)
   const nameRef = React.useRef<HTMLHeadingElement>(null)
-  const roleRef = React.useRef<HTMLParagraphElement>(null)
-  const introRef = React.useRef<HTMLDivElement>(null)
+  const headlineRef = React.useRef<HTMLHeadingElement>(null)
+  const subtitleRef = React.useRef<HTMLParagraphElement>(null)
   const factsRef = React.useRef<HTMLParagraphElement>(null)
   const ctaRef = React.useRef<HTMLDivElement>(null)
   const socialRef = React.useRef<HTMLDivElement>(null)
-  const statRef = React.useRef<HTMLDivElement>(null)
+  const metricsRef = React.useRef<HTMLDivElement>(null)
   const panelRef = React.useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
       const targets = [
         leadRef.current,
-        roleRef.current,
-        introRef.current,
+        nameRef.current,
+        subtitleRef.current,
         factsRef.current,
         ctaRef.current,
         socialRef.current,
-        statRef.current,
+        metricsRef.current,
       ].filter(Boolean)
 
       if (reducedMotion) {
-        gsap.set([...targets, nameRef.current, panelRef.current], { opacity: 1, filter: "none" })
+        gsap.set([...targets, headlineRef.current, panelRef.current], { opacity: 1, filter: "none" })
         return
       }
 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
 
-      if (nameRef.current) {
-        const split = SplitText.create(nameRef.current, { type: "chars" })
-        tl.set(nameRef.current, { opacity: 1 })
+      if (headlineRef.current) {
+        const split = SplitText.create(headlineRef.current, { type: "chars" })
+        tl.set(headlineRef.current, { opacity: 1 })
         tl.from(split.chars, {
           opacity: 0,
           y: 60,
-          stagger: 0.015,
+          stagger: 0.012,
           duration: 0.9,
           clearProps: "transform",
         })
@@ -72,7 +71,7 @@ export function Hero() {
       }
 
       targets.slice(1).forEach((el, i) => {
-        tl.from(el, { opacity: 0, y: 18, duration: 0.55, clearProps: "transform" }, 0.3 + i * 0.09)
+        tl.from(el, { opacity: 0, y: 18, duration: 0.55, clearProps: "transform" }, 0.3 + i * 0.08)
       })
 
       if (panelRef.current) {
@@ -92,10 +91,7 @@ export function Hero() {
       ref={rootRef}
       className="relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden border-b border-border pt-20 pb-6"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-24 -left-24 -z-10 size-[26rem] rounded-full bg-[#f0b429]/25 blur-[120px] dark:bg-teal/25"
-      />
+      <AmbientField />
 
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6">
         <p
@@ -105,37 +101,39 @@ export function Hero() {
           Hi, I&apos;m
         </p>
 
-        <h1
-          ref={nameRef}
-          className="mt-3 font-heading font-extrabold uppercase leading-[0.88] tracking-tight opacity-0"
-          style={{ fontSize: "clamp(1.75rem, 8vw, 6.5rem)" }}
-        >
-          Saravanakumar
+        <h1 ref={nameRef} className="mt-2 font-heading text-xl font-bold sm:text-2xl">
+          {site.name}
         </h1>
 
-        <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start lg:gap-8">
-          <div>
-            <p ref={roleRef} className="text-xl font-medium sm:text-2xl">
-              <RotatingRole roles={site.roles} />
-            </p>
+        <h2
+          ref={headlineRef}
+          className="mt-3 font-heading font-extrabold uppercase leading-[1.05] tracking-tight opacity-0"
+          style={{ fontSize: "clamp(1.15rem, 4.6vw, 4.25rem)" }}
+        >
+          {site.headlineLines.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </h2>
 
-            <div
-              ref={introRef}
-              className="mt-3 max-w-[54ch] space-y-1.5 text-base text-muted-foreground sm:text-lg"
+        <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-start lg:gap-8">
+          <div>
+            <p
+              ref={subtitleRef}
+              className="max-w-[56ch] text-base text-muted-foreground sm:text-lg"
             >
-              {site.introLines.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-            </div>
+              {site.subtitle}
+            </p>
 
             <p
               ref={factsRef}
-              className="mt-4 font-mono text-xs uppercase tracking-widest text-muted-foreground"
+              className="mt-3 font-mono text-xs uppercase tracking-widest text-muted-foreground"
             >
               Chennai, India · B.Tech, AI &amp; ML
             </p>
 
-            <div ref={ctaRef} className="mt-6 flex flex-wrap gap-4">
+            <div ref={ctaRef} className="mt-5 flex flex-wrap gap-4">
               <Button size="lg" onClick={() => scrollToSection("projects")}>
                 View My Work
               </Button>
@@ -166,15 +164,21 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="mx-auto mt-8 flex w-full max-w-[1400px] items-end justify-between px-4 sm:px-6">
+      <div className="mx-auto mt-6 flex w-full max-w-[1400px] flex-wrap items-end justify-between gap-6 px-4 sm:px-6">
         <ScrollCue />
-        <div ref={statRef} className="text-right">
-          <p className="font-heading text-4xl font-extrabold leading-none sm:text-5xl">
-            {String(projects.length).padStart(2, "0")}
-          </p>
-          <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-            Projects shipped
-          </p>
+        <div ref={metricsRef} className="grid grid-cols-3 gap-6 sm:gap-10">
+          {site.metrics.map((metric) => (
+            <div key={metric.value}>
+              <p className="font-heading text-2xl font-extrabold leading-none sm:text-3xl">
+                {metric.value}
+              </p>
+              <p className="mt-1.5 font-mono text-[10px] leading-snug uppercase tracking-widest text-muted-foreground sm:text-[11px]">
+                {metric.label[0]}
+                <br />
+                {metric.label[1]}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
