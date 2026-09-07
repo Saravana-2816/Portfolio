@@ -94,7 +94,7 @@ export function Hero() {
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-24 -left-24 -z-10 size-[26rem] rounded-full bg-teal/25 blur-[120px]"
+        className="pointer-events-none absolute -bottom-24 -left-24 -z-10 size-[26rem] rounded-full bg-[#f0b429]/25 blur-[120px] dark:bg-teal/25"
       />
 
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6">
