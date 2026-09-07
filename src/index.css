@@ -79,6 +79,12 @@
   --teal: #0d9488;
   --gold: #a16207;
 
+  /* Fixed (non theme-swapping) references for the theme-toggle eclipse transition */
+  --eclipse-bg-dark: #07080d;
+  --eclipse-bg-light: #f2f0eb;
+  --eclipse-glow-dark: #2dd4bf;
+  --eclipse-glow-light: #a16207;
+
   --background: var(--paper);
   --foreground: var(--text);
   --card: var(--panel);

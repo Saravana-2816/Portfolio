@@ -4,7 +4,6 @@ import { GitHubIcon, LinkedInIcon } from "@/components/icons/BrandIcons"
 import { useGSAP } from "@gsap/react"
 import { gsap, SplitText } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
-import { useTheme } from "@/hooks/useTheme"
 import { site } from "@/data/site"
 import { Button } from "@/components/ui/button"
 import { ScrollCue } from "@/components/sections/hero/ScrollCue"
@@ -22,7 +21,6 @@ const socials = [
 
 export function Hero() {
   const reducedMotion = useReducedMotion()
-  const { theme } = useTheme()
   const rootRef = React.useRef<HTMLDivElement>(null)
   const leadRef = React.useRef<HTMLParagraphElement>(null)
   const nameRef = React.useRef<HTMLHeadingElement>(null)
@@ -81,7 +79,7 @@ export function Hero() {
         )
       }
     },
-    { scope: rootRef, dependencies: [reducedMotion, theme] }
+    { scope: rootRef, dependencies: [reducedMotion] }
   )
 
   return (

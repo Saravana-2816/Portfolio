@@ -44,20 +44,28 @@ export function Navbar() {
         </button>
 
         <div className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
+          {navLinks.map((link, i) => (
             <button
               key={link.id}
               onClick={() => scrollToSection(link.id)}
               className={cn(
-                "relative px-3 py-2 font-mono text-xs uppercase tracking-widest transition-colors",
+                "relative flex items-center gap-1.5 px-3 py-2 font-mono text-xs uppercase tracking-widest transition-colors",
                 activeId === link.id
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
+              <span
+                className={cn(
+                  "transition-colors",
+                  activeId === link.id ? "text-teal" : "text-muted-foreground/50"
+                )}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
               {link.label}
               {activeId === link.id && (
-                <span className="absolute inset-x-2 -bottom-px h-px bg-foreground" />
+                <span className="absolute inset-x-2 -bottom-px h-px bg-teal" />
               )}
             </button>
           ))}
@@ -82,7 +90,7 @@ export function Navbar() {
                 <SheetTitle className="font-heading">Menu</SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-1 px-4">
-                {navLinks.map((link) => (
+                {navLinks.map((link, i) => (
                   <button
                     key={link.id}
                     onClick={() => {
@@ -90,12 +98,15 @@ export function Navbar() {
                       scrollToSection(link.id)
                     }}
                     className={cn(
-                      "px-3 py-2 text-left font-mono text-sm uppercase tracking-widest transition-colors",
+                      "flex items-center gap-2 px-3 py-2 text-left font-mono text-sm uppercase tracking-widest transition-colors",
                       activeId === link.id
                         ? "bg-secondary text-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
+                    <span className={activeId === link.id ? "text-teal" : "text-muted-foreground/50"}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                     {link.label}
                   </button>
                 ))}

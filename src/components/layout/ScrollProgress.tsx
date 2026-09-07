@@ -1,33 +1,31 @@
 import * as React from "react"
+import { useGSAP } from "@gsap/react"
+import { gsap, ScrollTrigger } from "@/lib/gsap"
 
 export function ScrollProgress() {
   const barRef = React.useRef<HTMLDivElement>(null)
 
-  React.useEffect(() => {
-    const onScroll = () => {
-      const doc = document.documentElement
-      const scrollTop = doc.scrollTop
-      const maxScroll = doc.scrollHeight - doc.clientHeight
-      const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0
-      if (barRef.current) {
-        barRef.current.style.width = `${progress}%`
-      }
-    }
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
-    }
+  useGSAP(() => {
+    if (!barRef.current) return
+    gsap.set(barRef.current, { scaleX: 0 })
+
+    const trigger = ScrollTrigger.create({
+      start: 0,
+      end: "max",
+      onUpdate: (self) => {
+        gsap.set(barRef.current, { scaleX: self.progress })
+      },
+    })
+
+    return () => trigger.kill()
   }, [])
 
   return (
     <div className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden bg-transparent">
       <div
         ref={barRef}
-        className="h-full bg-foreground transition-[width] duration-150 ease-out"
-        style={{ width: "0%" }}
+        className="h-full origin-left bg-linear-to-r from-teal to-gold"
+        style={{ transform: "scaleX(0)" }}
       />
     </div>
   )

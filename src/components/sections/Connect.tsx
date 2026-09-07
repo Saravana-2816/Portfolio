@@ -1,8 +1,12 @@
+import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
-import { Loader2, Mail, Phone } from "lucide-react"
+import { Loader2, Mail, Phone, Send } from "lucide-react"
+import { useGSAP } from "@gsap/react"
+import { gsap } from "@/lib/gsap"
+import { useReducedMotion } from "@/hooks/useReducedMotion"
 import { GitHubIcon, LinkedInIcon } from "@/components/icons/BrandIcons"
 import { site } from "@/data/site"
 import { useMaskedReveal } from "@/hooks/useMaskedReveal"
@@ -37,10 +41,49 @@ const directInfo = [
 
 export function Connect() {
   const introRef = useMaskedReveal<HTMLParagraphElement>()
+  const gridRef = React.useRef<HTMLDivElement>(null)
+  const lineRef = React.useRef<HTMLDivElement>(null)
+  const directRef = React.useRef<HTMLDivElement>(null)
+  const formPanelRef = React.useRef<HTMLFormElement>(null)
+  const reducedMotion = useReducedMotion()
   const form = useForm<ContactValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: { name: "", email: "", message: "" },
   })
+
+  useGSAP(
+    () => {
+      if (!gridRef.current) return
+
+      const directItems = directRef.current
+        ? Array.from(directRef.current.children)
+        : []
+      const formItems = formPanelRef.current
+        ? Array.from(formPanelRef.current.querySelectorAll('[data-slot="form-item"], button[type="submit"]'))
+        : []
+
+      if (reducedMotion) {
+        gsap.set([lineRef.current, ...directItems, ...formItems], { opacity: 1, scaleX: 1 })
+        return
+      }
+
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: gridRef.current, start: "top 78%", once: true },
+      })
+      tl.from(lineRef.current, { scaleX: 0, duration: 0.6, ease: "power2.out" })
+        .from(
+          directItems,
+          { opacity: 0, y: 12, duration: 0.4, stagger: 0.06, ease: "power2.out" },
+          "-=0.25"
+        )
+        .from(
+          formItems,
+          { opacity: 0, y: 12, duration: 0.4, stagger: 0.08, ease: "power2.out" },
+          "-=0.35"
+        )
+    },
+    { scope: gridRef, dependencies: [reducedMotion] }
+  )
 
   async function onSubmit(values: ContactValues) {
     try {
@@ -68,8 +111,13 @@ export function Connect() {
         Reach out.
       </p>
 
-      <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div className="space-y-3">
+      <div
+        ref={lineRef}
+        className="mt-6 h-px w-24 origin-left bg-linear-to-r from-teal to-gold"
+      />
+
+      <div ref={gridRef} className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div ref={directRef} className="space-y-3">
           {directInfo.map(({ label, href, icon: Icon }) => (
             <a
               key={label}
@@ -87,6 +135,7 @@ export function Connect() {
         <div className="relative">
           <Form {...form}>
             <form
+              ref={formPanelRef}
               onSubmit={form.handleSubmit(onSubmit)}
               className="glass-panel relative space-y-5 rounded-xl p-6"
             >
@@ -129,8 +178,16 @@ export function Connect() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+              <Button
+                type="submit"
+                className="group w-full"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Send className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-0.5" />
+                )}
                 Send message
               </Button>
             </form>

@@ -10,31 +10,33 @@ import { Badge } from "@/components/ui/badge"
 export function Experience() {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const railRef = React.useRef<HTMLDivElement>(null)
+  const nodeRefs = React.useRef<(HTMLSpanElement | null)[]>([])
+  const entryRefs = React.useRef<(HTMLDivElement | null)[]>([])
   const reducedMotion = useReducedMotion()
 
   useGSAP(
     () => {
       if (!railRef.current || !containerRef.current) return
 
+      const nodes = nodeRefs.current.filter(Boolean)
+      const entries = entryRefs.current.filter(Boolean)
+
       if (reducedMotion) {
         gsap.set(railRef.current, { scaleY: 1 })
+        gsap.set([...nodes, ...entries], { opacity: 1, scale: 1, x: 0 })
         return
       }
 
-      gsap.fromTo(
-        railRef.current,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 75%",
-            end: "bottom 60%",
-            scrub: true,
-          },
-        }
-      )
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
+      })
+      tl.from(railRef.current, { scaleY: 0, transformOrigin: "top", duration: 1.1, ease: "power2.out" })
+        .from(nodes, { scale: 0, duration: 0.3, stagger: 0.18, ease: "back.out(2.5)" }, "-=0.65")
+        .from(
+          entries,
+          { opacity: 0, x: -18, duration: 0.45, stagger: 0.18, ease: "power2.out", clearProps: "transform" },
+          "<0.05"
+        )
     },
     { scope: containerRef, dependencies: [reducedMotion] }
   )
@@ -55,9 +57,20 @@ export function Experience() {
         />
 
         <div className="flex flex-col gap-10">
-          {experience.map((item) => (
-            <div key={item.company} className="relative">
-              <span className="absolute top-1.5 -left-8 size-2.5 bg-foreground ring-4 ring-background sm:-left-10" />
+          {experience.map((item, i) => (
+            <div
+              key={item.company}
+              ref={(el) => {
+                entryRefs.current[i] = el
+              }}
+              className="relative"
+            >
+              <span
+                ref={(el) => {
+                  nodeRefs.current[i] = el
+                }}
+                className="absolute top-1.5 -left-8 size-2.5 bg-foreground ring-4 ring-background sm:-left-10"
+              />
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                 <h3 className="font-heading text-lg font-semibold">
                   {item.role} · {item.company}

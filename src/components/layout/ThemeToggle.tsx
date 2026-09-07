@@ -8,6 +8,7 @@ import { useReducedMotion } from "@/hooks/useReducedMotion"
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme()
   const iconRef = React.useRef<HTMLSpanElement>(null)
+  const buttonRef = React.useRef<HTMLButtonElement>(null)
   const reducedMotion = useReducedMotion()
 
   const handleClick = () => {
@@ -18,11 +19,17 @@ export function ThemeToggle() {
         { rotate: 0, opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }
       )
     }
-    toggleTheme()
+
+    const rect = buttonRef.current?.getBoundingClientRect()
+    const origin = rect
+      ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+      : undefined
+    toggleTheme(origin)
   }
 
   return (
     <Button
+      ref={buttonRef}
       variant="ghost"
       size="icon"
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
