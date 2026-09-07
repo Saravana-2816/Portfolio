@@ -5,6 +5,7 @@ import { toast } from "sonner"
 import { Loader2, Mail, Phone } from "lucide-react"
 import { GitHubIcon, LinkedInIcon } from "@/components/icons/BrandIcons"
 import { site } from "@/data/site"
+import { useMaskedReveal } from "@/hooks/useMaskedReveal"
 import { Section } from "@/components/layout/Section"
 import { SectionHeading } from "@/components/layout/SectionHeading"
 import { Button } from "@/components/ui/button"
@@ -35,6 +36,7 @@ const directInfo = [
 ]
 
 export function Connect() {
+  const introRef = useMaskedReveal<HTMLParagraphElement>()
   const form = useForm<ContactValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: { name: "", email: "", message: "" },
@@ -57,11 +59,14 @@ export function Connect() {
 
   return (
     <Section id="connect">
-      <SectionHeading
-        index={6}
-        title="Connect"
-        description="Have a role, a project, or just want to talk shop about RAG pipelines and system design? Reach out."
-      />
+      <SectionHeading index={6} title="Connect" />
+      <p
+        ref={introRef}
+        className="mt-3 max-w-[65ch] text-base text-muted-foreground opacity-0"
+      >
+        Have a role, a project, or just want to talk shop about RAG pipelines and system design?
+        Reach out.
+      </p>
 
       <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div className="space-y-3">

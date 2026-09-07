@@ -2,7 +2,7 @@ import * as React from "react"
 import { useGSAP } from "@gsap/react"
 import { gsap } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
-import { useBrightenReveal } from "@/hooks/useBrightenReveal"
+import { useMaskedReveal } from "@/hooks/useMaskedReveal"
 import { Section } from "@/components/layout/Section"
 import { SectionHeading } from "@/components/layout/SectionHeading"
 
@@ -66,7 +66,7 @@ function StatCard({ stat }: { stat: (typeof stats)[number] }) {
 }
 
 export function About() {
-  const bioRef = useBrightenReveal<HTMLParagraphElement>()
+  const bioRef = useMaskedReveal<HTMLParagraphElement>()
 
   return (
     <Section id="about">
@@ -74,7 +74,7 @@ export function About() {
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr]">
         <p
           ref={bioRef}
-          className="max-w-[75ch] text-base leading-relaxed text-muted-foreground sm:text-lg"
+          className="max-w-[75ch] text-base leading-relaxed text-muted-foreground opacity-0 sm:text-lg"
         >
           {bio}
         </p>

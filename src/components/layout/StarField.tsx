@@ -3,12 +3,18 @@ import { useTheme } from "@/hooks/useTheme"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
 
 type Star = {
-  x: number
-  y: number
+  x0: number
+  y0: number
   radius: number
   baseAlpha: number
   twinkleSpeed: number
   twinklePhase: number
+  driftRadiusX: number
+  driftRadiusY: number
+  driftSpeedX: number
+  driftSpeedY: number
+  driftPhaseX: number
+  driftPhaseY: number
   color: string
   parallax: number
 }
@@ -20,9 +26,9 @@ const DARK_PALETTE = [
 ]
 
 const LIGHT_PALETTE = [
-  { color: "20, 19, 15", weight: 0.55 },
-  { color: "13, 148, 136", weight: 0.25 },
-  { color: "161, 98, 7", weight: 0.2 },
+  { color: "20, 19, 15", weight: 0.5 },
+  { color: "13, 148, 136", weight: 0.28 },
+  { color: "161, 98, 7", weight: 0.22 },
 ]
 
 function pickColor(palette: typeof DARK_PALETTE) {
@@ -37,17 +43,25 @@ function pickColor(palette: typeof DARK_PALETTE) {
 
 function makeStars(width: number, height: number, isDark: boolean): Star[] {
   const palette = isDark ? DARK_PALETTE : LIGHT_PALETTE
-  const count = isDark ? Math.min(220, Math.floor((width * height) / 9000)) : Math.min(70, Math.floor((width * height) / 22000))
+  const count = isDark
+    ? Math.min(220, Math.floor((width * height) / 9000))
+    : Math.min(110, Math.floor((width * height) / 14000))
 
   return Array.from({ length: count }, () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    radius: isDark ? 0.5 + Math.random() * 1.4 : 0.6 + Math.random() * 1.1,
-    baseAlpha: isDark ? 0.35 + Math.random() * 0.55 : 0.12 + Math.random() * 0.18,
-    twinkleSpeed: 0.4 + Math.random() * 0.8,
+    x0: Math.random() * width,
+    y0: Math.random() * height,
+    radius: isDark ? 0.6 + Math.random() * 1.5 : 1 + Math.random() * 1.6,
+    baseAlpha: isDark ? 0.4 + Math.random() * 0.55 : 0.35 + Math.random() * 0.4,
+    twinkleSpeed: 0.5 + Math.random() * 1,
     twinklePhase: Math.random() * Math.PI * 2,
+    driftRadiusX: 6 + Math.random() * 14,
+    driftRadiusY: 6 + Math.random() * 14,
+    driftSpeedX: 0.08 + Math.random() * 0.12,
+    driftSpeedY: 0.08 + Math.random() * 0.12,
+    driftPhaseX: Math.random() * Math.PI * 2,
+    driftPhaseY: Math.random() * Math.PI * 2,
     color: pickColor(palette),
-    parallax: 0.02 + Math.random() * 0.05,
+    parallax: 0.03 + Math.random() * 0.08,
   }))
 }
 
@@ -65,7 +79,6 @@ export function StarField() {
     const isDark = theme === "dark"
     let width = window.innerWidth
     let height = window.innerHeight
-    let dpr = Math.min(window.devicePixelRatio || 1, 2)
     let stars = makeStars(width, height, isDark)
     let scrollY = window.scrollY
     let visible = !document.hidden
@@ -74,7 +87,7 @@ export function StarField() {
     function resize() {
       width = window.innerWidth
       height = window.innerHeight
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
       canvas!.width = width * dpr
       canvas!.height = height * dpr
       canvas!.style.width = `${width}px`
@@ -91,13 +104,18 @@ export function StarField() {
       visible = !document.hidden
     }
 
-    function drawStatic() {
+    function paint(t: number, animate: boolean) {
       ctx!.clearRect(0, 0, width, height)
       for (const star of stars) {
-        const y = ((star.y - scrollY * star.parallax) % height + height) % height
+        const driftX = animate ? Math.sin(t * star.driftSpeedX + star.driftPhaseX) * star.driftRadiusX : 0
+        const driftY = animate ? Math.cos(t * star.driftSpeedY + star.driftPhaseY) * star.driftRadiusY : 0
+        const x = star.x0 + driftX
+        const rawY = star.y0 + driftY - scrollY * star.parallax
+        const y = ((rawY % height) + height) % height
+        const twinkle = animate ? 0.55 + 0.45 * Math.sin(t * star.twinkleSpeed + star.twinklePhase) : 1
         ctx!.beginPath()
-        ctx!.fillStyle = `rgba(${star.color}, ${star.baseAlpha})`
-        ctx!.arc(star.x, y, star.radius, 0, Math.PI * 2)
+        ctx!.fillStyle = `rgba(${star.color}, ${star.baseAlpha * twinkle})`
+        ctx!.arc(x, y, star.radius, 0, Math.PI * 2)
         ctx!.fill()
       }
     }
@@ -105,17 +123,7 @@ export function StarField() {
     function tick(time: number) {
       frameId = requestAnimationFrame(tick)
       if (!visible) return
-
-      ctx!.clearRect(0, 0, width, height)
-      const t = time / 1000
-      for (const star of stars) {
-        const y = ((star.y - scrollY * star.parallax) % height + height) % height
-        const twinkle = 0.65 + 0.35 * Math.sin(t * star.twinkleSpeed + star.twinklePhase)
-        ctx!.beginPath()
-        ctx!.fillStyle = `rgba(${star.color}, ${star.baseAlpha * twinkle})`
-        ctx!.arc(star.x, y, star.radius, 0, Math.PI * 2)
-        ctx!.fill()
-      }
+      paint(time / 1000, true)
     }
 
     resize()
@@ -124,7 +132,7 @@ export function StarField() {
     document.addEventListener("visibilitychange", onVisibility)
 
     if (reducedMotion) {
-      drawStatic()
+      paint(0, false)
     } else {
       frameId = requestAnimationFrame(tick)
     }
