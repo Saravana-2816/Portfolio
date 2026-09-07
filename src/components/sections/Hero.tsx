@@ -9,7 +9,6 @@ import { site } from "@/data/site"
 import { Button } from "@/components/ui/button"
 import { ScrollCue } from "@/components/sections/hero/ScrollCue"
 import { CodePanel } from "@/components/sections/hero/CodePanel"
-import { AmbientField } from "@/components/sections/hero/AmbientField"
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -91,8 +90,6 @@ export function Hero() {
       ref={rootRef}
       className="relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden border-b border-border pt-20 pb-6"
     >
-      <AmbientField />
-
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6">
         <p
           ref={leadRef}

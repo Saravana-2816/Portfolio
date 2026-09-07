@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { BackToTop } from "@/components/layout/BackToTop"
 import { CustomCursor } from "@/components/layout/CustomCursor"
+import { StarField } from "@/components/layout/StarField"
 import { Hero } from "@/components/sections/Hero"
 import { About } from "@/components/sections/About"
 import { Experience } from "@/components/sections/Experience"
@@ -17,6 +18,7 @@ function App() {
   return (
     <ThemeProvider>
       <TooltipProvider>
+        <StarField />
         <Navbar />
         <main className="isolate">
           <Hero />
