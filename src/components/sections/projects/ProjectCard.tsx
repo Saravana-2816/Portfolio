@@ -1,11 +1,24 @@
 import * as React from "react"
-import { ExternalLink } from "lucide-react"
+import { ArrowUpRight, ExternalLink } from "lucide-react"
 import { cn } from "cn"
 import { useGSAP } from "@gsap/react"
 import { gsap } from "@/lib/gsap"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
 import type { Project } from "@/data/projects"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+const CASE_STUDY_BEATS = [
+  { key: "challenge", label: "The challenge" },
+  { key: "approach", label: "The approach" },
+  { key: "outcome", label: "The outcome" },
+] as const
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
   const cardRef = React.useRef<HTMLElement>(null)
@@ -87,8 +100,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
   return (
     <article
       ref={cardRef}
-      tabIndex={0}
-      className="glass-panel group relative flex min-h-[220px] flex-col overflow-hidden rounded-xl p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="glass-panel group relative flex min-h-[220px] flex-col overflow-hidden rounded-xl p-6"
     >
       <div
         ref={gridRef}
@@ -152,6 +164,66 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
           </Badge>
         ))}
       </div>
+
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className={cn(
+              "group/link relative mt-5 flex w-fit items-center gap-1.5 font-mono text-xs uppercase tracking-widest transition-colors",
+              accentColor
+            )}
+          >
+            Read case study
+            <ArrowUpRight className="size-3.5 transition-transform duration-300 ease-out group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-h-[85vh] max-w-[calc(100%-2rem)] gap-5 overflow-y-auto sm:max-w-xl">
+          <DialogHeader>
+            <p className={cn("font-mono text-xs font-medium", accentColor)}>
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <DialogTitle className="font-heading text-xl leading-snug font-bold">
+              {project.title}
+            </DialogTitle>
+            {project.status && (
+              <p className="text-xs text-muted-foreground">{project.status}</p>
+            )}
+          </DialogHeader>
+
+          <div className="space-y-5">
+            {CASE_STUDY_BEATS.map(({ key, label }) => (
+              <div key={key}>
+                <p className={cn("font-mono text-xs uppercase tracking-widest", accentColor)}>
+                  {label}
+                </p>
+                <p className="mt-1.5 text-sm text-foreground/90 sm:text-base">
+                  {project[key]}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+              <Badge key={tag} variant="outline" className="font-mono text-xs font-normal">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+
+          {project.href && (
+            <a
+              href={project.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
+            >
+              Open project <ExternalLink className="size-3.5" />
+            </a>
+          )}
+        </DialogContent>
+      </Dialog>
     </article>
   )
 }

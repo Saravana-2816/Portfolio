@@ -5,18 +5,25 @@ type ContactRequest = IncomingMessage & { body?: unknown }
 
 const CONTACT_TO_EMAIL = "saravana28092004@gmail.com"
 
+const INTENT_LABELS: Record<string, string> = {
+  "full-time": "Full-time opportunity",
+  freelance: "Freelance / contract project",
+  other: "Something else",
+}
+
 function isValidPayload(
   body: unknown
-): body is { name: string; email: string; message: string } {
+): body is { name: string; email: string; message: string; intent?: string } {
   if (typeof body !== "object" || body === null) return false
-  const { name, email, message } = body as Record<string, unknown>
+  const { name, email, message, intent } = body as Record<string, unknown>
   return (
     typeof name === "string" &&
     name.trim().length >= 2 &&
     typeof email === "string" &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
     typeof message === "string" &&
-    message.trim().length >= 10
+    message.trim().length >= 10 &&
+    (intent === undefined || typeof intent === "string")
   )
 }
 
@@ -33,7 +40,8 @@ export default async function handler(req: ContactRequest, res: ServerResponse) 
     return
   }
 
-  const { name, email, message } = req.body
+  const { name, email, message, intent } = req.body
+  const intentLabel = intent ? (INTENT_LABELS[intent] ?? intent) : null
 
   if (!process.env.RESEND_API_KEY) {
     res.writeHead(500, { "Content-Type": "application/json" })
@@ -47,8 +55,10 @@ export default async function handler(req: ContactRequest, res: ServerResponse) 
       from: "Portfolio Contact <onboarding@resend.dev>",
       to: CONTACT_TO_EMAIL,
       replyTo: email,
-      subject: `New message from ${name} via portfolio`,
-      text: `From: ${name} <${email}>\n\n${message}`,
+      subject: intentLabel
+        ? `New message from ${name} via portfolio — ${intentLabel}`
+        : `New message from ${name} via portfolio`,
+      text: `From: ${name} <${email}>${intentLabel ? `\nReason: ${intentLabel}` : ""}\n\n${message}`,
     })
 
     res.writeHead(200, { "Content-Type": "application/json" })

@@ -8,8 +8,8 @@ export function Projects() {
     <Section id="projects">
       <SectionHeading
         index={3}
-        title="Projects"
-        description="A mix of production systems and applied AI experiments."
+        title="Work"
+        description="A mix of production systems and applied AI experiments — open any of them for the challenge, the approach, and what shipped."
       />
 
       <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2">

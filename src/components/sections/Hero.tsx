@@ -26,6 +26,7 @@ export function Hero() {
   const nameRef = React.useRef<HTMLHeadingElement>(null)
   const headlineRef = React.useRef<HTMLHeadingElement>(null)
   const subtitleRef = React.useRef<HTMLParagraphElement>(null)
+  const availabilityRef = React.useRef<HTMLDivElement>(null)
   const factsRef = React.useRef<HTMLParagraphElement>(null)
   const ctaRef = React.useRef<HTMLDivElement>(null)
   const socialRef = React.useRef<HTMLDivElement>(null)
@@ -38,6 +39,7 @@ export function Hero() {
         leadRef.current,
         nameRef.current,
         subtitleRef.current,
+        availabilityRef.current,
         factsRef.current,
         ctaRef.current,
         socialRef.current,
@@ -120,6 +122,17 @@ export function Hero() {
             >
               {site.subtitle}
             </p>
+
+            <div
+              ref={availabilityRef}
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground sm:text-sm"
+            >
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal opacity-75 motion-reduce:animate-none" />
+                <span className="relative inline-flex size-2 rounded-full bg-teal" />
+              </span>
+              {site.availability}
+            </div>
 
             <p
               ref={factsRef}

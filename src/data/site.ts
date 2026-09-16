@@ -3,6 +3,7 @@ export const site = {
   headlineLines: ["I build systems that", "think, scale & adapt."],
   subtitle:
     "Backend engineer focused on AI systems, RAG pipelines, distributed systems and the infrastructure that brings them to production.",
+  availability: "Open to full-time roles and select freelance / contract work.",
   metrics: [
     { value: "04", label: ["Projects", "Shipped"] },
     { value: "02+", label: ["Years Learning", "& Building"] },
@@ -18,7 +19,7 @@ export const site = {
 export const navLinks = [
   { id: "about", label: "About" },
   { id: "experience", label: "Experience" },
-  { id: "projects", label: "Projects" },
+  { id: "projects", label: "Work" },
   { id: "skills", label: "Skills" },
   { id: "education", label: "Education" },
   { id: "connect", label: "Connect" },
