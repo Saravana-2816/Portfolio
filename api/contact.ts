@@ -51,15 +51,19 @@ export default async function handler(req: ContactRequest, res: ServerResponse) 
   const { name, email, message, intent } = req.body
   const intentLabel = intent ? (INTENT_LABELS[intent] ?? intent) : null
 
-  if (!process.env.RESEND_API_KEY) {
+  // A pasted key can carry a stray newline, which makes the Authorization header invalid.
+  const apiKey = process.env.RESEND_API_KEY?.trim()
+  if (!apiKey) {
+    console.error("[contact] RESEND_API_KEY is not set for this environment")
     res.writeHead(500, { "Content-Type": "application/json" })
     res.end(JSON.stringify({ error: "Email service is not configured" }))
     return
   }
 
   try {
-    const resend = new Resend(process.env.RESEND_API_KEY)
-    await resend.emails.send({
+    const resend = new Resend(apiKey)
+    // Resend reports API failures in the result instead of throwing.
+    const { error } = await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>",
       to: CONTACT_TO_EMAIL,
       replyTo: email,
@@ -69,9 +73,17 @@ export default async function handler(req: ContactRequest, res: ServerResponse) 
       text: `From: ${name} <${email}>${intentLabel ? `\nReason: ${intentLabel}` : ""}\n\n${message}`,
     })
 
+    if (error) {
+      console.error("[contact] Resend rejected the email:", JSON.stringify(error))
+      res.writeHead(502, { "Content-Type": "application/json" })
+      res.end(JSON.stringify({ error: "Failed to send email" }))
+      return
+    }
+
     res.writeHead(200, { "Content-Type": "application/json" })
     res.end(JSON.stringify({ ok: true }))
-  } catch {
+  } catch (err) {
+    console.error("[contact] Sending threw:", err instanceof Error ? `${err.name}: ${err.message}` : err)
     res.writeHead(502, { "Content-Type": "application/json" })
     res.end(JSON.stringify({ error: "Failed to send email" }))
   }
