@@ -74,4 +74,4 @@ npm run preview
 
 ## Deploy
 
-Deployed on Vercel, which auto-detects the Vite build (`dist` output). Add `RESEND_API_KEY` under the project's Environment Variables for the contact form. Once the production domain is final, make `og:image` absolute and add `og:url` in `index.html` (marked with a `DEPLOY STEP` comment).
+Live at https://saravanakumarks.vercel.app. Vercel deploys every push to `main` (it auto-detects the Vite build and the `api/` function). Add `RESEND_API_KEY` under the project's Environment Variables for the contact form. If the domain changes, update the absolute URLs in `index.html`, `public/sitemap.xml` and `public/robots.txt`.

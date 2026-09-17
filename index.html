@@ -13,8 +13,9 @@
     />
     <meta name="author" content="Saravanakumar KS" />
 
-    <!-- DEPLOY STEP: once the production domain is final, add og:url and a canonical link,
-         and make og:image / twitter:image absolute (https://your-domain/og.jpg). -->
+    <!-- Production domain: update these absolute URLs, sitemap.xml and robots.txt if it changes -->
+    <link rel="canonical" href="https://saravanakumarks.vercel.app/" />
+    <meta property="og:url" content="https://saravanakumarks.vercel.app/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Saravanakumar KS" />
     <meta property="og:title" content="Saravanakumar KS | Full-Stack Developer & AI Engineer" />
@@ -22,7 +23,7 @@
       property="og:description"
       content="I build full-stack products end-to-end, and the intelligence that powers them. RAG pipelines, fine-tuned LLMs, agentic workflows, Kubernetes."
     />
-    <meta property="og:image" content="/og.jpg" />
+    <meta property="og:image" content="https://saravanakumarks.vercel.app/og.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:alt" content="Saravanakumar KS, Full-Stack Developer and AI Engineer, name drawn in particles" />
     <meta property="og:image:width" content="1200" />
@@ -33,13 +34,14 @@
       name="twitter:description"
       content="I build full-stack products end-to-end, and the intelligence that powers them."
     />
-    <meta name="twitter:image" content="/og.jpg" />
+    <meta name="twitter:image" content="https://saravanakumarks.vercel.app/og.jpg" />
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Saravanakumar KS",
+        "url": "https://saravanakumarks.vercel.app/",
         "jobTitle": "Full-Stack Developer & AI Engineer",
         "worksFor": { "@type": "Organization", "name": "Slate.AI" },
         "alumniOf": { "@type": "CollegeOrUniversity", "name": "Rajalakshmi Engineering College" },
