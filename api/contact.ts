@@ -40,6 +40,14 @@ export default async function handler(req: ContactRequest, res: ServerResponse) 
     return
   }
 
+  // Honeypot filled in: a bot. Answer like a success so it moves on.
+  const honeypot = (req.body as { website?: unknown }).website
+  if (typeof honeypot === "string" && honeypot.trim() !== "") {
+    res.writeHead(200, { "Content-Type": "application/json" })
+    res.end(JSON.stringify({ ok: true }))
+    return
+  }
+
   const { name, email, message, intent } = req.body
   const intentLabel = intent ? (INTENT_LABELS[intent] ?? intent) : null
 

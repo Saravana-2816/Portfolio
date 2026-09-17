@@ -1,7 +1,7 @@
 import * as React from "react"
-import { gsap } from "@/lib/gsap"
+import { flushSync } from "react-dom"
 
-type Theme = "dark" | "light"
+export type Theme = "dark" | "light"
 
 type Origin = { x: number; y: number }
 
@@ -12,38 +12,38 @@ type ThemeContextValue = {
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null)
 
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "light"
-  const stored = window.localStorage.getItem("theme")
-  if (stored === "dark" || stored === "light") return stored
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light"
+const THEME_COLORS: Record<Theme, string> = { dark: "#06070d", light: "#f4f5f9" }
+
+function readInitialTheme(): Theme {
+  // index.html already applied the class before first paint; mirror it.
+  return document.documentElement.classList.contains("dark") ? "dark" : "light"
 }
 
-function prefersReducedMotion() {
-  if (typeof window === "undefined") return false
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+function applyTheme(theme: Theme) {
+  const root = document.documentElement
+  root.classList.toggle("dark", theme === "dark")
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[theme])
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = React.useState<Theme>(getInitialTheme)
-  const overlayRef = React.useRef<HTMLDivElement>(null)
-  const animatingRef = React.useRef(false)
+  const [theme, setTheme] = React.useState<Theme>(readInitialTheme)
+  const busy = React.useRef(false)
 
   React.useEffect(() => {
-    const root = document.documentElement
-    root.classList.toggle("dark", theme === "dark")
-    window.localStorage.setItem("theme", theme)
+    applyTheme(theme)
   }, [theme])
 
+  // Follow the OS until the visitor makes an explicit choice.
   React.useEffect(() => {
-    const stored = window.localStorage.getItem("theme")
-    if (stored === "dark" || stored === "light") return
-
     const mql = window.matchMedia("(prefers-color-scheme: dark)")
     const onChange = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? "dark" : "light")
+      let stored: string | null = null
+      try {
+        stored = localStorage.getItem("theme")
+      } catch {
+        /* storage blocked */
+      }
+      if (stored !== "dark" && stored !== "light") setTheme(e.matches ? "dark" : "light")
     }
     mql.addEventListener("change", onChange)
     return () => mql.removeEventListener("change", onChange)
@@ -51,49 +51,47 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = React.useCallback(
     (origin?: Origin) => {
+      if (busy.current) return
       const next: Theme = theme === "dark" ? "light" : "dark"
-      const overlay = overlayRef.current
+      try {
+        localStorage.setItem("theme", next)
+      } catch {
+        /* storage blocked */
+      }
 
-      if (!overlay || animatingRef.current || prefersReducedMotion()) {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      if (!document.startViewTransition || reduced) {
+        applyTheme(next)
         setTheme(next)
         return
       }
 
       const x = origin?.x ?? window.innerWidth / 2
-      const y = origin?.y ?? window.innerHeight / 2
-      const bgVar = next === "dark" ? "var(--eclipse-bg-dark)" : "var(--eclipse-bg-light)"
-      const glowVar = next === "dark" ? "var(--eclipse-glow-dark)" : "var(--eclipse-glow-light)"
+      const y = origin?.y ?? 0
+      const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
 
-      animatingRef.current = true
-      overlay.style.background = `radial-gradient(circle at ${x}px ${y}px, ${glowVar} 0%, ${bgVar} 65%)`
-
-      gsap
-        .timeline({ onComplete: () => (animatingRef.current = false) })
-        .set(overlay, { clipPath: `circle(0% at ${x}px ${y}px)`, opacity: 1 })
-        .to(overlay, {
-          clipPath: `circle(145% at ${x}px ${y}px)`,
-          duration: 0.26,
-          ease: "power2.in",
+      busy.current = true
+      const transition = document.startViewTransition(() => {
+        applyTheme(next)
+        flushSync(() => setTheme(next))
+      })
+      transition.ready
+        .then(() => {
+          document.documentElement.animate(
+            { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+            { duration: 750, easing: "cubic-bezier(0.76, 0, 0.24, 1)", pseudoElement: "::view-transition-new(root)" }
+          )
         })
-        .call(() => setTheme(next))
-        .to(overlay, { opacity: 0, duration: 0.16, ease: "power1.out" })
+        .catch(() => {})
+      transition.finished.finally(() => {
+        busy.current = false
+      })
     },
     [theme]
   )
 
   const value = React.useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
-
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-      <div
-        ref={overlayRef}
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-[999] opacity-0"
-        style={{ clipPath: "circle(0% at 50% 50%)" }}
-      />
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
 export function useTheme() {

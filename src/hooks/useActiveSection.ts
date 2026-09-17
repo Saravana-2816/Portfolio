@@ -1,30 +1,43 @@
 import * as React from "react"
 
-export function useActiveSection(ids: string[]) {
-  const [activeId, setActiveId] = React.useState<string>(ids[0] ?? "")
+/**
+ * The section whose body crosses the upper-middle band of the viewport.
+ * Sections mount progressively after the hero, so late arrivals are picked up too.
+ */
+export function useActiveSection(ids: readonly string[]) {
+  const [activeId, setActiveId] = React.useState("")
 
   React.useEffect(() => {
-    const elements = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null)
+    const visible = new Map<string, boolean>()
+    const watched = new Set<Element>()
 
-    if (elements.length === 0) return
-
-    const observer = new IntersectionObserver(
+    const intersection = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-
-        if (visible.length > 0) {
-          setActiveId(visible[0].target.id)
-        }
+        entries.forEach((entry) => visible.set(entry.target.id, entry.isIntersecting))
+        setActiveId(ids.find((id) => visible.get(id)) ?? "")
       },
-      { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
+      { rootMargin: "-45% 0px -50% 0px" }
     )
 
-    elements.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
+    const watchNew = () => {
+      ids.forEach((id) => {
+        const el = document.getElementById(id)
+        if (el && !watched.has(el)) {
+          watched.add(el)
+          intersection.observe(el)
+        }
+      })
+    }
+    watchNew()
+
+    const main = document.getElementById("main")
+    const mutations = new MutationObserver(watchNew)
+    if (main) mutations.observe(main, { childList: true })
+
+    return () => {
+      intersection.disconnect()
+      mutations.disconnect()
+    }
   }, [ids])
 
   return activeId

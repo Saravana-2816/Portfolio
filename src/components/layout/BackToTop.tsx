@@ -1,29 +1,60 @@
 import * as React from "react"
 import { ArrowUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "cn"
+import { useGSAP } from "@gsap/react"
+import { gsap, ScrollTrigger } from "@/lib/gsap"
+import { scrollToId } from "@/lib/smooth-scroll"
 
+const CIRCUMFERENCE = 2 * Math.PI * 21
+
+/** Appears after the hero; its ring doubles as a reading-progress gauge. */
 export function BackToTop() {
+  const buttonRef = React.useRef<HTMLButtonElement>(null)
+  const ringRef = React.useRef<SVGCircleElement>(null)
   const [visible, setVisible] = React.useState(false)
 
-  React.useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.8)
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
+  useGSAP(() => {
+    const hero = document.getElementById("hero")
+    const ring = ringRef.current
+    if (!hero || !ring) return
+    ScrollTrigger.create({
+      trigger: hero,
+      start: "bottom top",
+      end: "max",
+      onToggle: (self) => setVisible(self.isActive),
+    })
+    ScrollTrigger.create({
+      start: 0,
+      end: "max",
+      onUpdate: (self) => gsap.set(ring, { strokeDashoffset: CIRCUMFERENCE * (1 - self.progress) }),
+    })
+  })
 
   return (
-    <Button
-      size="icon"
+    <button
+      ref={buttonRef}
+      type="button"
       aria-label="Back to top"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className={cn(
-        "fixed bottom-6 right-6 z-40 rounded-full shadow-lg transition-all duration-300",
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
-      )}
+      tabIndex={visible ? 0 : -1}
+      onClick={() => scrollToId("top")}
+      className={`group fixed right-4 bottom-4 z-40 grid size-12 place-items-center rounded-full border border-line bg-background/70 text-foreground backdrop-blur-md transition-[opacity,transform,border-color] duration-500 ease-(--ease-out-expo) hover:border-line-strong sm:right-6 sm:bottom-6 ${
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
+      }`}
     >
-      <ArrowUp className="size-4" />
-    </Button>
+      <svg aria-hidden viewBox="0 0 48 48" className="absolute inset-0 size-full -rotate-90">
+        <circle
+          ref={ringRef}
+          cx="24"
+          cy="24"
+          r="21"
+          fill="none"
+          stroke="var(--signal)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeDasharray={CIRCUMFERENCE}
+          strokeDashoffset={CIRCUMFERENCE}
+        />
+      </svg>
+      <ArrowUp className="size-4 transition-transform duration-500 ease-(--ease-out-expo) group-hover:-translate-y-0.5" />
+    </button>
   )
 }

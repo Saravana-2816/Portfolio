@@ -1,56 +1,54 @@
 import * as React from "react"
 import { useGSAP } from "@gsap/react"
 import { gsap } from "@/lib/gsap"
-import { useReducedMotion } from "@/hooks/useReducedMotion"
+import { prefersReducedMotion } from "@/lib/env"
+import { cn } from "@/lib/utils"
 
 type SectionHeadingProps = {
-  index: number
   title: string
-  description?: string
-  align?: "left" | "center"
+  intro?: React.ReactNode
+  aside?: React.ReactNode
+  className?: string
+  id?: string
 }
 
-export function SectionHeading({ index, title, description, align = "left" }: SectionHeadingProps) {
-  const ref = React.useRef<HTMLDivElement>(null)
-  const reducedMotion = useReducedMotion()
+/**
+ * One quiet rise on first entry. Headings are never the loud part, so the title
+ * moves as a single block behind a mask: no text splitting, no extra layout work.
+ */
+export function SectionHeading({ title, intro, aside, className, id }: SectionHeadingProps) {
+  const rootRef = React.useRef<HTMLDivElement>(null)
+  const titleRef = React.useRef<HTMLSpanElement>(null)
+  const introRef = React.useRef<HTMLParagraphElement>(null)
 
   useGSAP(
     () => {
-      if (reducedMotion || !ref.current) return
-      gsap.from(ref.current, {
-        opacity: 0,
-        y: 24,
-        duration: 0.7,
-        ease: "power2.out",
-        clearProps: "transform",
-        scrollTrigger: {
-          trigger: ref.current,
-          start: "top 85%",
-          once: true,
-        },
-      })
+      if (prefersReducedMotion() || !titleRef.current) return
+      const tl = gsap.timeline({ scrollTrigger: { trigger: rootRef.current, start: "top 85%", once: true } })
+      tl.from(titleRef.current, { yPercent: 105, duration: 1.2 })
+      if (introRef.current) tl.from(introRef.current, { opacity: 0, y: 16, duration: 1.1 }, 0.15)
     },
-    { scope: ref, dependencies: [reducedMotion] }
+    { scope: rootRef }
   )
 
   return (
-    <div ref={ref} className={align === "center" ? "text-center" : "text-left"}>
-      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-        {String(index).padStart(2, "0")}
-      </p>
-      <h2 className="mt-2 font-heading text-4xl font-extrabold uppercase leading-[0.95] tracking-tight sm:text-5xl">
-        {title}
-      </h2>
-      {description && (
-        <p
-          className={
-            "mt-3 max-w-[65ch] text-base text-muted-foreground" +
-            (align === "center" ? " mx-auto" : "")
-          }
+    <div ref={rootRef} className={cn("flex flex-col gap-8 md:flex-row md:items-end md:justify-between", className)}>
+      <div>
+        <h2
+          id={id}
+          className="split-mask overflow-hidden font-display text-[clamp(2.75rem,7.2vw,6.25rem)] leading-[0.92] font-semibold tracking-[-0.045em]"
         >
-          {description}
-        </p>
-      )}
+          <span ref={titleRef} className="block">
+            {title}
+          </span>
+        </h2>
+        {intro && (
+          <p ref={introRef} className="mt-5 max-w-[52ch] text-base text-muted-foreground sm:text-lg">
+            {intro}
+          </p>
+        )}
+      </div>
+      {aside}
     </div>
   )
 }

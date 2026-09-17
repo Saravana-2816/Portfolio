@@ -1,18 +1,17 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
-type SectionProps = React.ComponentProps<"section"> & {
-  id: string
-}
+type SectionProps = React.ComponentProps<"section"> & { id: string }
 
 export function Section({ id, className, children, ...props }: SectionProps) {
   return (
     <section
       id={id}
-      className={cn("mx-auto max-w-[1120px] px-4 py-20 sm:px-6 sm:py-28", className)}
+      aria-labelledby={`${id}-title`}
+      className={cn("relative scroll-mt-20 py-20 sm:py-28 lg:py-32", className)}
       {...props}
     >
-      {children}
+      <div className="container-page">{children}</div>
     </section>
   )
 }

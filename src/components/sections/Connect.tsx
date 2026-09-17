@@ -1,222 +1,175 @@
 import * as React from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { toast } from "sonner"
-import { Loader2, Mail, Phone, Send } from "lucide-react"
+import { ArrowUpRight, Check, Copy, FileText } from "lucide-react"
 import { useGSAP } from "@gsap/react"
-import { gsap } from "@/lib/gsap"
-import { useReducedMotion } from "@/hooks/useReducedMotion"
-import { GitHubIcon, LinkedInIcon } from "@/components/icons/BrandIcons"
+import { gsap, ScrollTrigger, SplitText } from "@/lib/gsap"
+import { prefersReducedMotion } from "@/lib/env"
+import { onApproach } from "@/lib/motion"
 import { site } from "@/data/site"
-import { useMaskedReveal } from "@/hooks/useMaskedReveal"
-import { Section } from "@/components/layout/Section"
-import { SectionHeading } from "@/components/layout/SectionHeading"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { GitHubIcon, LinkedInIcon } from "@/components/icons/BrandIcons"
 
-const contactSchema = z.object({
-  name: z.string().min(2, "Enter your name."),
-  email: z.string().email("Enter a valid email address."),
-  intent: z.enum(["full-time", "freelance", "other"]),
-  message: z.string().min(10, "Say a little more — at least 10 characters."),
-})
+const ContactForm = React.lazy(() => import("@/components/sections/connect/ContactForm"))
 
-type ContactValues = z.infer<typeof contactSchema>
-
-const directInfo = [
-  { label: site.email, href: `mailto:${site.email}`, icon: Mail },
-  { label: site.phone, href: `tel:${site.phone.replace(/\s+/g, "")}`, icon: Phone },
-  { label: "LinkedIn", href: site.linkedin, icon: LinkedInIcon },
-  { label: "GitHub", href: site.github, icon: GitHubIcon },
+const channels = [
+  { label: "LinkedIn", value: "saravanakumar-ks", href: site.linkedin, icon: LinkedInIcon },
+  { label: "GitHub", value: "Saravana-2816", href: site.github, icon: GitHubIcon },
+  { label: "Résumé", value: "PDF", href: site.resumeHref, icon: FileText },
 ]
 
 export function Connect() {
-  const introRef = useMaskedReveal<HTMLParagraphElement>()
-  const gridRef = React.useRef<HTMLDivElement>(null)
-  const lineRef = React.useRef<HTMLDivElement>(null)
-  const directRef = React.useRef<HTMLDivElement>(null)
-  const formPanelRef = React.useRef<HTMLFormElement>(null)
-  const reducedMotion = useReducedMotion()
-  const form = useForm<ContactValues>({
-    resolver: zodResolver(contactSchema),
-    defaultValues: { name: "", email: "", intent: "full-time", message: "" },
-  })
+  const rootRef = React.useRef<HTMLElement>(null)
+  const headlineRef = React.useRef<HTMLHeadingElement>(null)
+  const formSlotRef = React.useRef<HTMLDivElement>(null)
+  const [copied, setCopied] = React.useState(false)
+  const [formNear, setFormNear] = React.useState(false)
+
+  // Fetch the form's code when the visitor is within a couple of screens of it.
+  React.useEffect(() => {
+    const slot = formSlotRef.current
+    if (!slot) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setFormNear(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: "1600px 0px" }
+    )
+    observer.observe(slot)
+    return () => observer.disconnect()
+  }, [])
 
   useGSAP(
     () => {
-      if (!gridRef.current) return
+      const headline = headlineRef.current
+      if (prefersReducedMotion() || !headline) return
+      const fades = rootRef.current?.querySelectorAll("[data-connect-fade]") ?? []
+      const channels = rootRef.current?.querySelectorAll("[data-channel]") ?? []
+      onApproach(headline, () => gsap.set([fades, channels], { opacity: 0 }))
 
-      const directItems = directRef.current
-        ? Array.from(directRef.current.children)
-        : []
-      const formItems = formPanelRef.current
-        ? Array.from(formPanelRef.current.querySelectorAll('[data-slot="form-item"], button[type="submit"]'))
-        : []
-
-      if (reducedMotion) {
-        gsap.set([lineRef.current, ...directItems, ...formItems], { opacity: 1, scaleX: 1 })
-        return
-      }
-
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: gridRef.current, start: "top 78%", once: true },
+      let split: SplitText | null = null
+      ScrollTrigger.create({
+        trigger: headline,
+        start: "top 80%",
+        once: true,
+        onEnter: () => {
+          // Split only when it plays, and hand the original text back afterwards.
+          split = SplitText.create(headline, { type: "lines,words", mask: "lines", linesClass: "split-mask", aria: "none" })
+          // Split words sit in their own boxes; re-apply the gradient so "ships." keeps its color.
+          headline.querySelectorAll(".text-gradient-signal > div").forEach((word) => {
+            word.classList.add("text-gradient-signal")
+          })
+          gsap
+            .timeline({ onComplete: () => split?.revert() })
+            .from(split.words, { yPercent: 110, duration: 1.3, stagger: 0.06 })
+            .fromTo(fades, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.1, stagger: 0.1 }, 0.35)
+            .fromTo(channels, { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 1, stagger: 0.07 }, 0.5)
+        },
       })
-      tl.from(lineRef.current, { scaleX: 0, duration: 0.6, ease: "power2.out" })
-        .from(
-          directItems,
-          { opacity: 0, y: 12, duration: 0.4, stagger: 0.06, ease: "power2.out" },
-          "-=0.25"
-        )
-        .from(
-          formItems,
-          { opacity: 0, y: 12, duration: 0.4, stagger: 0.08, ease: "power2.out" },
-          "-=0.35"
-        )
+      return () => split?.revert()
     },
-    { scope: gridRef, dependencies: [reducedMotion] }
+    { scope: rootRef }
   )
 
-  async function onSubmit(values: ContactValues) {
+  const copyEmail = async () => {
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      })
-      if (!res.ok) throw new Error("Request failed")
-      toast.success("Message sent — I'll get back to you soon.")
-      form.reset()
+      await navigator.clipboard.writeText(site.email)
+      setCopied(true)
+      toast.success("Email copied.")
+      window.setTimeout(() => setCopied(false), 2000)
     } catch {
-      toast.error("Something went wrong. Try emailing me directly instead.")
+      toast.error("Couldn't copy. The address is " + site.email)
     }
   }
 
   return (
-    <Section id="connect">
-      <SectionHeading index={6} title="Connect" />
-      <p
-        ref={introRef}
-        className="mt-3 max-w-[65ch] text-base text-muted-foreground opacity-0"
-      >
-        Have a role, a project, or just want to talk shop about RAG pipelines and system design?
-        Reach out.
-      </p>
-
-      <div
-        ref={lineRef}
-        className="mt-6 h-px w-24 origin-left bg-linear-to-r from-teal to-gold"
-      />
-
-      <div ref={gridRef} className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div ref={directRef} className="space-y-3">
-          {directInfo.map(({ label, href, icon: Icon }) => (
-            <a
-              key={label}
-              href={href}
-              target={href.startsWith("http") ? "_blank" : undefined}
-              rel={href.startsWith("http") ? "noreferrer" : undefined}
-              className="glass-panel glass-panel-hover flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-colors hover:text-foreground sm:text-base"
-            >
-              <Icon className="size-4 shrink-0" />
-              <span>{label}</span>
-            </a>
-          ))}
+    <section ref={rootRef} id="connect" aria-labelledby="connect-title" className="relative overflow-hidden py-20 sm:py-28 lg:py-32">
+      <div className="container-page">
+        <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-end lg:gap-16">
+          <h2
+            id="connect-title"
+            ref={headlineRef}
+            className="max-w-[14ch] font-display text-[clamp(3rem,9vw,8.5rem)] leading-[0.9] font-semibold tracking-[-0.05em]"
+          >
+            Let&apos;s build something that <span className="text-gradient-signal pr-[0.06em]">ships.</span>
+          </h2>
+          <p data-connect-fade className="max-w-[40ch] text-lg text-muted-foreground sm:text-xl lg:pb-4">
+            Have a role, a project, or just want to talk shop about RAG pipelines and system design? Reach out.
+          </p>
         </div>
 
-        <div className="relative">
-          <Form {...form}>
-            <form
-              ref={formPanelRef}
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="glass-panel relative space-y-5 rounded-xl p-6"
-            >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="intent"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reaching out about</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="full-time">A full-time opportunity</SelectItem>
-                        <SelectItem value="freelance">A freelance or contract project</SelectItem>
-                        <SelectItem value="other">Something else</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="message"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Message</FormLabel>
-                    <FormControl>
-                      <Textarea rows={5} placeholder="What are you building?" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="group w-full"
-                disabled={form.formState.isSubmitting}
+        <div className="mt-16 grid gap-14 sm:mt-24 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+          <div className="flex flex-col">
+            <div data-connect-fade className="flex flex-wrap items-center gap-3">
+              <a
+                href={`mailto:${site.email}`}
+                className="group relative font-display text-[clamp(1.25rem,2.6vw,2.1rem)] font-medium tracking-[-0.02em] break-all"
               >
-                {form.formState.isSubmitting ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <Send className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-0.5" />
-                )}
-                Send message
-              </Button>
-            </form>
-          </Form>
+                {site.email}
+                <span
+                  aria-hidden
+                  className="absolute -bottom-1 left-0 h-px w-full origin-right scale-x-0 bg-signal transition-transform duration-700 ease-(--ease-out-expo) group-hover:origin-left group-hover:scale-x-100"
+                />
+              </a>
+              <button
+                type="button"
+                onClick={copyEmail}
+                aria-label="Copy email address"
+                className="grid size-10 place-items-center rounded-full border border-line text-muted-foreground transition-colors hover:border-line-strong hover:text-foreground"
+              >
+                {copied ? <Check className="size-4 text-signal" /> : <Copy className="size-4" />}
+              </button>
+            </div>
+
+            <ul className="mt-12 border-t border-line">
+              {channels.map(({ label, value, href, icon: Icon }) => {
+                const external = href.startsWith("http") || href.endsWith(".pdf")
+                return (
+                  <li key={label} data-channel className="border-b border-line">
+                    <a
+                      href={href}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noreferrer" : undefined}
+                      className="group relative isolate -mx-3 flex items-center gap-4 overflow-hidden rounded-xl px-3 py-5"
+                    >
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 -z-10 origin-bottom scale-y-0 bg-raised transition-transform duration-500 ease-(--ease-out-expo) group-hover:scale-y-100"
+                      />
+                      <Icon className="size-[18px] text-muted-foreground transition-colors group-hover:text-foreground" />
+                      <span className="text-lg font-medium">{label}</span>
+                      <span className="ml-auto truncate text-sm text-muted-foreground">{value}</span>
+                      <ArrowUpRight
+                        aria-hidden
+                        className="size-4 shrink-0 -translate-x-2 text-signal opacity-0 transition-[opacity,transform] duration-500 ease-(--ease-out-expo) group-hover:translate-x-0 group-hover:opacity-100"
+                      />
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+
+          <div data-connect-fade className="relative">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -inset-10 -z-10 opacity-70 blur-3xl"
+              style={{
+                background:
+                  "radial-gradient(40% 45% at 30% 35%, color-mix(in srgb, var(--signal) 32%, transparent), transparent 70%), radial-gradient(40% 45% at 72% 70%, color-mix(in srgb, var(--pulse) 26%, transparent), transparent 70%)",
+              }}
+            />
+            <div ref={formSlotRef} className="min-h-[540px] sm:min-h-[470px]">
+              {formNear && (
+                <React.Suspense fallback={null}>
+                  <ContactForm />
+                </React.Suspense>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </Section>
+    </section>
   )
 }

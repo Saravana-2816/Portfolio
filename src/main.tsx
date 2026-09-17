@@ -1,4 +1,5 @@
-import "@fontsource-variable/bricolage-grotesque"
+import "@fontsource-variable/space-grotesk"
+import "@fontsource-variable/inter"
 import "@fontsource-variable/jetbrains-mono"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
@@ -13,3 +14,7 @@ createRoot(document.getElementById("root")!).render(
 )
 
 document.fonts.ready.then(() => ScrollTrigger.refresh())
+
+document.addEventListener("visibilitychange", () => {
+  document.body.classList.toggle("tab-hidden", document.hidden)
+})

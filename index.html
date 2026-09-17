@@ -2,49 +2,93 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#06070d" />
 
-    <title>Saravanakumar KS — Full-Stack Developer &amp; AI Engineer</title>
+    <title>Saravanakumar KS | Full-Stack Developer &amp; AI Engineer</title>
     <meta
       name="description"
-      content="Saravanakumar KS builds full-stack products end-to-end and the intelligence that powers them — RAG pipelines, fine-tuned LLMs, agentic workflows, and systems that scale."
+      content="Saravanakumar KS builds full-stack products end-to-end and the intelligence that powers them: production RAG pipelines, fine-tuned LLMs, agentic workflows, and systems that ship and scale."
     />
+    <meta name="author" content="Saravanakumar KS" />
 
+    <!-- DEPLOY STEP: once the production domain is final, add og:url and a canonical link,
+         and make og:image / twitter:image absolute (https://your-domain/og.jpg). -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Saravanakumar KS — Full-Stack Developer & AI Engineer" />
+    <meta property="og:site_name" content="Saravanakumar KS" />
+    <meta property="og:title" content="Saravanakumar KS | Full-Stack Developer & AI Engineer" />
     <meta
       property="og:description"
-      content="Full-stack products end-to-end, and the intelligence that powers them — RAG pipelines, fine-tuned LLMs, agentic workflows, Kubernetes."
+      content="I build full-stack products end-to-end, and the intelligence that powers them. RAG pipelines, fine-tuned LLMs, agentic workflows, Kubernetes."
     />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Saravanakumar KS — Full-Stack Developer & AI Engineer" />
+    <meta property="og:image" content="/og.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content="Saravanakumar KS, Full-Stack Developer and AI Engineer, name drawn in particles" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Saravanakumar KS | Full-Stack Developer & AI Engineer" />
     <meta
       name="twitter:description"
-      content="Full-stack products end-to-end, and the intelligence that powers them — RAG pipelines, fine-tuned LLMs, agentic workflows, Kubernetes."
+      content="I build full-stack products end-to-end, and the intelligence that powers them."
     />
+    <meta name="twitter:image" content="/og.jpg" />
 
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Saravanakumar KS",
+        "jobTitle": "Full-Stack Developer & AI Engineer",
+        "worksFor": { "@type": "Organization", "name": "Slate.AI" },
+        "alumniOf": { "@type": "CollegeOrUniversity", "name": "Rajalakshmi Engineering College" },
+        "email": "mailto:saravana28092004@gmail.com",
+        "sameAs": [
+          "https://github.com/Saravana-2816",
+          "https://www.linkedin.com/in/saravanakumar-ks-548861257/"
+        ]
+      }
+    </script>
+
+    <style>
+      html { background: #f4f5f9; }
+      html.dark { background: #06070d; }
+      .js-intro [data-intro],
+      .js-intro [data-intro-name] { opacity: 0; }
+    </style>
     <script>
       (function () {
+        var root = document.documentElement
+        var theme = null
         try {
-          var stored = localStorage.getItem("theme");
-          var theme =
-            stored === "dark" || stored === "light"
-              ? stored
-              : window.matchMedia("(prefers-color-scheme: dark)").matches
-                ? "dark"
-                : "light";
-          if (theme === "dark") {
-            document.documentElement.classList.add("dark");
-          }
+          theme = localStorage.getItem("theme")
         } catch (e) {}
-      })();
+        if (theme !== "dark" && theme !== "light") {
+          theme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
+        }
+        if (theme === "dark") root.classList.add("dark")
+        var meta = document.querySelector('meta[name="theme-color"]')
+        if (meta) meta.setAttribute("content", theme === "dark" ? "#06070d" : "#f4f5f9")
+
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          root.classList.add("js-intro")
+          // Failsafe: never leave the hero hidden if a script fails to run.
+          setTimeout(function () {
+            root.classList.remove("js-intro")
+          }, 6000)
+        }
+      })()
     </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p style="padding: 2rem; font-family: system-ui">
+        Saravanakumar KS, Full-Stack Developer &amp; AI Engineer.
+        <a href="mailto:saravana28092004@gmail.com">saravana28092004@gmail.com</a>
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

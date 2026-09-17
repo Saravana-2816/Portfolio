@@ -1,229 +1,163 @@
 import * as React from "react"
-import { ArrowUpRight, ExternalLink } from "lucide-react"
-import { cn } from "cn"
+import { ArrowUpRight } from "lucide-react"
 import { useGSAP } from "@gsap/react"
 import { gsap } from "@/lib/gsap"
-import { useReducedMotion } from "@/hooks/useReducedMotion"
+import { cn } from "@/lib/utils"
+import { isFinePointer, prefersReducedMotion } from "@/lib/env"
+import { onApproach } from "@/lib/motion"
 import type { Project } from "@/data/projects"
-import { Badge } from "@/components/ui/badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { ProjectDiagram } from "@/components/sections/projects/ProjectDiagram"
 
-const CASE_STUDY_BEATS = [
-  { key: "challenge", label: "The challenge" },
-  { key: "approach", label: "The approach" },
-  { key: "outcome", label: "The outcome" },
-] as const
+const ACCENTS: Record<Project["diagram"], string> = {
+  attendance: "var(--glow)",
+  rag: "var(--pulse)",
+  tryon: "var(--pulse)",
+  drive: "var(--signal)",
+}
 
-export function ProjectCard({ project, index }: { project: Project; index: number }) {
+type ProjectCardProps = {
+  project: Project
+  layout: "wide" | "wide-reverse" | "tall"
+}
+
+export function ProjectCard({ project, layout }: ProjectCardProps) {
   const cardRef = React.useRef<HTMLElement>(null)
-  const numberRef = React.useRef<HTMLParagraphElement>(null)
-  const descRef = React.useRef<HTMLParagraphElement>(null)
-  const tagsRef = React.useRef<HTMLDivElement>(null)
-  const lineRef = React.useRef<HTMLSpanElement>(null)
-  const gridRef = React.useRef<HTMLDivElement>(null)
-  const reducedMotion = useReducedMotion()
-  const accentColor = index % 2 === 0 ? "text-teal" : "text-gold"
+  const figureRef = React.useRef<HTMLDivElement>(null)
 
+  // Diagrams draw themselves in, strokes first, then the nodes and labels.
   useGSAP(
     () => {
       const card = cardRef.current
-      if (!card) return
+      const figure = figureRef.current
+      if (!card || !figure) return
+      if (prefersReducedMotion()) return
 
-      if (reducedMotion) {
-        gsap.set([card, numberRef.current, descRef.current, tagsRef.current, gridRef.current], {
-          clearProps: "all",
-          opacity: 1,
-        })
-        gsap.set(gridRef.current, { opacity: 0.5 })
-        return
-      }
+      // Measuring every path for the draw-in is layout work: only do it when the card is near.
+      onApproach(card, () => {
+        const strokes = figure.querySelectorAll("[data-draw]")
+        const pops = figure.querySelectorAll("[data-pop]")
+        const copy = card.querySelectorAll("[data-copy]")
 
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: card, start: "top 78%", once: true },
+        const tl = gsap.timeline({ scrollTrigger: { trigger: card, start: "top 80%", once: true } })
+        tl.from(card, { opacity: 0, y: 60, duration: 1.2 })
+          .from(strokes, { drawSVG: "0%", duration: 1.6, stagger: 0.03, ease: "swing" }, 0.2)
+          .from(pops, { opacity: 0, duration: 0.8, stagger: 0.02, ease: "none" }, 0.9)
+          .from(copy, { opacity: 0, y: 18, duration: 1, stagger: 0.07 }, 0.25)
       })
-      tl.from(card, {
-        clipPath: "inset(0 100% 0 0)",
-        y: 24,
-        duration: 0.75,
-        ease: "power3.out",
-        clearProps: "clipPath",
-      })
-        .from(numberRef.current, { x: -16, opacity: 0, duration: 0.4, ease: "power2.out" }, 0.1)
-        .to(gridRef.current, { opacity: 0.5, duration: 0.6, ease: "power1.out" }, 0.1)
-        .from(
-          [descRef.current, tagsRef.current],
-          { y: 14, opacity: 0, duration: 0.45, stagger: 0.05, ease: "power2.out" },
-          0.25
-        )
-
-      const mm = gsap.matchMedia()
-      mm.add("(hover: hover) and (pointer: fine)", () => {
-        const onEnter = () => {
-          gsap.to(card, {
-            y: -6,
-            borderColor: "var(--foreground)",
-            boxShadow: "var(--panel-shadow-hover)",
-            duration: 0.35,
-            ease: "power2.out",
-          })
-          gsap.to(lineRef.current, { scaleX: 1, duration: 0.35, ease: "power2.out" })
-        }
-        const onLeave = () => {
-          gsap.to(card, {
-            y: 0,
-            borderColor: "var(--border)",
-            boxShadow: "var(--panel-shadow)",
-            duration: 0.35,
-            ease: "power2.out",
-          })
-          gsap.to(lineRef.current, { scaleX: 0, duration: 0.3, ease: "power2.in" })
-        }
-        card.addEventListener("mouseenter", onEnter)
-        card.addEventListener("mouseleave", onLeave)
-        return () => {
-          card.removeEventListener("mouseenter", onEnter)
-          card.removeEventListener("mouseleave", onLeave)
-        }
-      })
-
-      return () => mm.revert()
     },
-    { scope: cardRef, dependencies: [reducedMotion] }
+    { scope: cardRef }
   )
+
+  // A soft wash in the project's own color follows the pointer.
+  const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
+    if (!isFinePointer()) return
+    const card = cardRef.current
+    if (!card) return
+    const r = card.getBoundingClientRect()
+    card.style.setProperty("--mx", `${e.clientX - r.left}px`)
+    card.style.setProperty("--my", `${e.clientY - r.top}px`)
+  }
+
+  const wide = layout !== "tall"
+  const [main, suffix] = project.title.split(" — ")
 
   return (
     <article
       ref={cardRef}
-      className="glass-panel group relative flex min-h-[220px] flex-col overflow-hidden rounded-xl p-6"
+      onPointerMove={onPointerMove}
+      style={{ "--card-accent": ACCENTS[project.diagram] } as React.CSSProperties}
+      className={cn(
+        "group relative isolate overflow-hidden rounded-[1.75rem] border border-line bg-panel/80 transition-[border-color] duration-700 hover:border-line-strong",
+        wide ? "md:col-span-2" : ""
+      )}
     >
       <div
-        ref={gridRef}
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
         style={{
-          backgroundImage: "radial-gradient(circle, var(--line) 1px, transparent 1px)",
-          backgroundSize: "14px 14px",
-          maskImage: "linear-gradient(to bottom, black, transparent 85%)",
+          background:
+            "radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--card-accent) 13%, transparent), transparent 65%)",
         }}
       />
-      <span
-        ref={lineRef}
-        aria-hidden
-        className={cn("absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0", accentColor)}
-        style={{ backgroundColor: "currentColor" }}
-      />
 
-      <div className="relative flex items-start justify-between gap-3">
-        <div>
-          <p ref={numberRef} className={cn("font-mono text-xs font-medium", accentColor)}>
-            {String(index + 1).padStart(2, "0")}
-          </p>
-          <h3 className="mt-1 font-heading text-lg leading-snug font-bold transition-transform duration-300 group-hover:-translate-y-1 group-focus-within:-translate-y-1">
-            {project.title}
-          </h3>
-        </div>
-        {project.href && (
-          <a
-            href={project.href}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`Open ${project.title}`}
-            className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ExternalLink className="size-4" />
-          </a>
-        )}
-      </div>
-
-      {project.status && (
-        <p className="relative mt-1 text-xs text-muted-foreground">{project.status}</p>
-      )}
-
-      <p
-        ref={descRef}
-        className="relative mt-4 max-w-[60ch] flex-1 text-sm text-muted-foreground sm:text-base"
+      <div
+        className={cn("grid h-full grid-rows-[auto_1fr]", wide && "lg:grid-cols-2 lg:grid-rows-1")}
       >
-        {project.description}
-      </p>
-
-      <div ref={tagsRef} className="relative mt-4 flex flex-wrap gap-2">
-        {project.tags.map((tag, i) => (
-          <Badge
-            key={tag}
-            variant="outline"
-            style={{ transitionDelay: `${i * 30}ms` }}
-            className="font-mono text-xs font-normal text-muted-foreground transition-colors duration-200 group-hover:text-foreground"
-          >
-            {tag}
-          </Badge>
-        ))}
-      </div>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            className={cn(
-              "group/link relative mt-5 flex w-fit items-center gap-1.5 font-mono text-xs uppercase tracking-widest transition-colors",
-              accentColor
-            )}
-          >
-            Read case study
-            <ArrowUpRight className="size-3.5 transition-transform duration-300 ease-out group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
-          </button>
-        </DialogTrigger>
-        <DialogContent className="max-h-[85vh] max-w-[calc(100%-2rem)] gap-5 overflow-y-auto sm:max-w-xl">
-          <DialogHeader>
-            <p className={cn("font-mono text-xs font-medium", accentColor)}>
-              {String(index + 1).padStart(2, "0")}
-            </p>
-            <DialogTitle className="font-heading text-xl leading-snug font-bold">
-              {project.title}
-            </DialogTitle>
-            {project.status && (
-              <p className="text-xs text-muted-foreground">{project.status}</p>
-            )}
-          </DialogHeader>
-
-          <div className="space-y-5">
-            {CASE_STUDY_BEATS.map(({ key, label }) => (
-              <div key={key}>
-                <p className={cn("font-mono text-xs uppercase tracking-widest", accentColor)}>
-                  {label}
-                </p>
-                <p className="mt-1.5 text-sm text-foreground/90 sm:text-base">
-                  {project[key]}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="font-mono text-xs font-normal">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-
-          {project.href && (
-            <a
-              href={project.href}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
-            >
-              Open project <ExternalLink className="size-3.5" />
-            </a>
+        {/* Diagram first on small screens; wide cards alternate sides from lg up */}
+        <div
+          className={cn(
+            "order-2 flex flex-col p-6 sm:p-9 lg:p-12",
+            layout === "wide" && "lg:order-1",
+            layout === "wide-reverse" && "lg:order-2"
           )}
-        </DialogContent>
-      </Dialog>
+        >
+          {project.qualifier && (
+            <p data-copy className="mb-5 flex items-center gap-2.5 text-sm text-muted-foreground">
+              {project.production && (
+                <span className="relative flex size-1.5">
+                  <span className="live-ping absolute inset-0 rounded-full bg-ember" />
+                  <span className="relative size-1.5 rounded-full bg-ember" />
+                </span>
+              )}
+              {project.qualifier}
+            </p>
+          )}
+
+          <h3
+            data-copy
+            className={cn(
+              "font-display font-semibold tracking-[-0.035em] text-balance",
+              // Line height must follow the size: the class merger drops it otherwise.
+              wide ? "text-[clamp(1.75rem,3.2vw,2.75rem)] leading-[1.04]" : "text-[clamp(1.6rem,2.5vw,2.15rem)] leading-[1.06]"
+            )}
+          >
+            {main}
+            {suffix && <span className="block text-muted-foreground">— {suffix}</span>}
+          </h3>
+
+          <p data-copy className="mt-5 max-w-[58ch] text-base leading-relaxed text-muted-foreground sm:text-[17px]">
+            {project.description}
+          </p>
+
+          <div data-copy className="mt-auto flex flex-wrap items-end justify-between gap-4 pt-8">
+            <ul aria-label="Tags" className="flex flex-wrap gap-2">
+              {project.tags.map((tag) => (
+                <li
+                  key={tag}
+                  className="rounded-full border border-line px-3 py-1 font-mono text-xs text-muted-foreground transition-colors duration-500 group-hover:border-line-strong group-hover:text-foreground"
+                >
+                  {tag}
+                </li>
+              ))}
+            </ul>
+            {project.href && (
+              <a
+                href={project.href}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-line-strong px-4 py-2 text-sm transition-colors hover:border-foreground"
+              >
+                Open project
+                <ArrowUpRight className="size-4" />
+              </a>
+            )}
+          </div>
+        </div>
+
+        <div
+          ref={figureRef}
+          className={cn(
+            "relative order-1 flex items-center justify-center border-b border-line px-6 py-8 sm:px-10",
+            layout === "wide" && "lg:order-2 lg:border-b-0 lg:border-l",
+            layout === "wide-reverse" && "lg:order-1 lg:border-r lg:border-b-0"
+          )}
+        >
+          <div aria-hidden className="hairline-grid mask-fade-b pointer-events-none absolute inset-0 opacity-50" />
+          <div className="relative w-full max-w-[520px] transition-transform duration-1000 ease-(--ease-out-expo) group-hover:scale-[1.02]">
+            <ProjectDiagram kind={project.diagram} />
+          </div>
+        </div>
+      </div>
     </article>
   )
 }

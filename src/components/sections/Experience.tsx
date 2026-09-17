@@ -1,103 +1,144 @@
 import * as React from "react"
 import { useGSAP } from "@gsap/react"
-import { gsap } from "@/lib/gsap"
-import { useReducedMotion } from "@/hooks/useReducedMotion"
+import { gsap, ScrollTrigger } from "@/lib/gsap"
+import { prefersReducedMotion } from "@/lib/env"
+import { onApproach } from "@/lib/motion"
 import { experience } from "@/data/experience"
 import { Section } from "@/components/layout/Section"
 import { SectionHeading } from "@/components/layout/SectionHeading"
-import { Badge } from "@/components/ui/badge"
 
 export function Experience() {
-  const containerRef = React.useRef<HTMLDivElement>(null)
-  const railRef = React.useRef<HTMLDivElement>(null)
-  const nodeRefs = React.useRef<(HTMLSpanElement | null)[]>([])
-  const entryRefs = React.useRef<(HTMLDivElement | null)[]>([])
-  const reducedMotion = useReducedMotion()
+  const listRef = React.useRef<HTMLOListElement>(null)
+  const fillRef = React.useRef<HTMLSpanElement>(null)
+  const headRef = React.useRef<HTMLSpanElement>(null)
 
+  // A signal travels down the rail as you scroll; each role lights when it arrives.
   useGSAP(
     () => {
-      if (!railRef.current || !containerRef.current) return
+      const list = listRef.current
+      const fill = fillRef.current
+      const head = headRef.current
+      if (!list || !fill || !head) return
+      const items = gsap.utils.toArray<HTMLElement>("[data-role]", list)
 
-      const nodes = nodeRefs.current.filter(Boolean)
-      const entries = entryRefs.current.filter(Boolean)
-
-      if (reducedMotion) {
-        gsap.set(railRef.current, { scaleY: 1 })
-        gsap.set([...nodes, ...entries], { opacity: 1, scale: 1, x: 0 })
+      if (prefersReducedMotion()) {
+        gsap.set(fill, { scaleY: 1 })
+        gsap.set(head, { opacity: 0 })
+        items.forEach((item) => item.classList.add("is-lit"))
         return
       }
 
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
+      ScrollTrigger.create({
+        trigger: list,
+        start: "top 65%",
+        end: "bottom 65%",
+        onUpdate: (self) => {
+          gsap.set(fill, { scaleY: self.progress })
+          gsap.set(head, { y: self.progress * list.offsetHeight, opacity: self.progress > 0 && self.progress < 1 ? 1 : 0 })
+        },
       })
-      tl.from(railRef.current, { scaleY: 0, transformOrigin: "top", duration: 1.1, ease: "power2.out" })
-        .from(nodes, { scale: 0, duration: 0.3, stagger: 0.18, ease: "back.out(2.5)" }, "-=0.65")
-        .from(
-          entries,
-          { opacity: 0, x: -18, duration: 0.45, stagger: 0.18, ease: "power2.out", clearProps: "transform" },
-          "<0.05"
-        )
+
+      items.forEach((item) => {
+        ScrollTrigger.create({
+          trigger: item,
+          start: "top 65%",
+          onEnter: () => item.classList.add("is-lit"),
+          onLeaveBack: () => item.classList.remove("is-lit"),
+        })
+        onApproach(item, () => {
+          gsap.from(item.querySelectorAll("[data-chip]"), {
+            opacity: 0,
+            y: 10,
+            duration: 0.7,
+            stagger: 0.025,
+            scrollTrigger: { trigger: item, start: "top 60%", once: true },
+          })
+        })
+      })
     },
-    { scope: containerRef, dependencies: [reducedMotion] }
+    { scope: listRef }
   )
 
   return (
     <Section id="experience">
-      <SectionHeading
-        index={2}
-        title="Experience"
-        description="Most recent first — building across the stack, with a growing DevOps footprint."
-      />
+      <SectionHeading id="experience-title" title="Experience" intro="Most recent first." />
 
-      <div ref={containerRef} className="relative mt-10 pl-8 sm:pl-10">
-        <div className="absolute top-1 left-[3px] h-full w-px bg-border sm:left-[7px]" />
-        <div
-          ref={railRef}
-          className="absolute top-1 left-[3px] h-full w-px origin-top bg-foreground sm:left-[7px]"
+      <ol ref={listRef} className="relative mt-16 sm:mt-24">
+        {/* Rail: base line, scroll-driven fill, and the travelling signal head */}
+        <span aria-hidden className="absolute top-2 bottom-0 left-[7px] w-px bg-line md:left-[259px]" />
+        <span
+          ref={fillRef}
+          aria-hidden
+          className="absolute top-2 bottom-0 left-[7px] w-px origin-top scale-y-0 bg-linear-to-b from-signal to-glow md:left-[259px]"
+        />
+        <span
+          ref={headRef}
+          aria-hidden
+          className="absolute top-2 left-[4px] size-[7px] rounded-full bg-glow opacity-0 shadow-[0_0_16px_4px_var(--glow)] md:left-[256px]"
         />
 
-        <div className="flex flex-col gap-10">
-          {experience.map((item, i) => (
-            <div
-              key={item.company}
-              ref={(el) => {
-                entryRefs.current[i] = el
-              }}
-              className="relative"
+        {experience.map((job) => (
+          <li
+            key={job.company}
+            data-role
+            className="group/role relative grid gap-4 pb-20 pl-10 last:pb-2 md:grid-cols-[228px_1fr] md:gap-16 md:pl-0"
+          >
+            {/* Node on the rail */}
+            <span
+              aria-hidden
+              className="absolute top-2 left-0 grid size-[15px] place-items-center rounded-full border border-line-strong bg-background transition-[border-color,box-shadow] duration-700 group-[.is-lit]/role:border-signal group-[.is-lit]/role:shadow-[0_0_0_6px_color-mix(in_srgb,var(--signal)_14%,transparent)] md:left-[252px]"
             >
-              <span
-                ref={(el) => {
-                  nodeRefs.current[i] = el
-                }}
-                className="absolute top-1.5 -left-8 size-2.5 bg-foreground ring-4 ring-background sm:-left-10"
-              />
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h3 className="font-heading text-lg font-semibold">
-                  {item.role} · {item.company}
-                  {item.location && (
-                    <span className="text-muted-foreground"> — {item.location}</span>
-                  )}
-                </h3>
-                <span className="text-sm text-muted-foreground">{item.period}</span>
-              </div>
-              <ul className="mt-3 space-y-2">
-                {item.points.map((point) => (
-                  <li key={point} className="max-w-[70ch] text-sm text-muted-foreground sm:text-base">
+              <span className="size-[5px] scale-0 rounded-full bg-signal transition-transform duration-700 ease-(--ease-out-expo) group-[.is-lit]/role:scale-100" />
+            </span>
+
+            <div className="flex flex-col gap-1.5 md:pt-1 md:text-right">
+              <p className="font-mono text-[13px] tracking-tight text-foreground">{job.period}</p>
+              {job.note && <p className="text-sm text-muted-foreground">{job.note}</p>}
+              {job.current && (
+                <p className="mt-1 inline-flex items-center gap-2 self-start text-sm text-ember md:self-end">
+                  <span className="relative flex size-1.5">
+                    <span className="live-ping absolute inset-0 rounded-full bg-ember" />
+                    <span className="relative size-1.5 rounded-full bg-ember" />
+                  </span>
+                  Current role
+                </p>
+              )}
+            </div>
+
+            <div className="md:pl-10">
+              {/* Only the large title dims before the signal arrives: it stays above 3:1 while dim */}
+              <h3 className="font-display text-[clamp(1.75rem,3.4vw,2.9rem)] leading-[1.02] font-semibold tracking-[-0.035em] opacity-60 transition-opacity duration-700 group-[.is-lit]/role:opacity-100">
+                {job.role}
+              </h3>
+              <p className="mt-2 text-lg text-muted-foreground">
+                <span className="font-medium text-foreground">{job.company}</span>
+                {job.location && <>, {job.location}</>}
+              </p>
+
+              <ul className="mt-6 flex max-w-[64ch] flex-col gap-3">
+                {job.points.map((point) => (
+                  <li key={point} className="relative pl-5 text-base leading-relaxed text-muted-foreground sm:text-[17px]">
+                    <span aria-hidden className="absolute top-[0.7em] left-0 h-px w-2.5 bg-line-strong" />
                     {point}
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {item.tools.map((tool) => (
-                  <Badge key={tool} variant="outline" className="font-mono text-xs font-normal">
+
+              <ul aria-label="Tools" className="mt-7 flex flex-wrap gap-2">
+                {job.tools.map((tool) => (
+                  <li
+                    key={tool}
+                    data-chip
+                    className="rounded-full border border-line px-3 py-1 font-mono text-xs text-muted-foreground"
+                  >
                     {tool}
-                  </Badge>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
-          ))}
-        </div>
-      </div>
+          </li>
+        ))}
+      </ol>
     </Section>
   )
 }

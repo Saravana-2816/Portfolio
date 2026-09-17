@@ -1,16 +1,13 @@
 export const site = {
   name: "Saravanakumar KS",
-  headlineLines: ["I build systems that", "think, scale & adapt."],
-  subtitle:
-    "Backend engineer focused on AI systems, RAG pipelines, distributed systems and the infrastructure that brings them to production.",
-  availability: "Open to full-time roles and select freelance / contract work.",
-  metrics: [
-    { value: "04", label: ["Projects", "Shipped"] },
-    { value: "02+", label: ["Years Learning", "& Building"] },
-    { value: "03", label: ["Core Domains", "Backend · AI · Systems"] },
-  ],
+  nameLines: ["SARAVANAKUMAR", "KS"],
+  leadIn: "Hi, I'm",
+  roles: ["Full-Stack Developer", "AI Engineer", "RAG & LLM Builder", "Aspiring System Design Architect"],
+  tagline: {
+    lead: "I build full-stack products end-to-end",
+    rest: "and the intelligence that powers them.",
+  },
   email: "saravana28092004@gmail.com",
-  phone: "+91 76399 24552",
   linkedin: "https://www.linkedin.com/in/saravanakumar-ks-548861257/",
   github: "https://github.com/Saravana-2816",
   resumeHref: "/Resume.pdf",

@@ -5,8 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
   --color-background: var(--background);
@@ -29,94 +30,42 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Named system tokens */
+  /* Latent Space tokens */
   --color-ink: var(--ink);
-  --color-paper: var(--paper);
+  --color-raised: var(--raised);
   --color-panel: var(--panel);
   --color-line: var(--line);
-  --color-teal: var(--teal);
-  --color-gold: var(--gold);
+  --color-line-strong: var(--line-strong);
+  --color-signal: var(--signal);
+  --color-glow: var(--glow);
+  --color-pulse: var(--pulse);
+  --color-ember: var(--ember);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --animate-fade-in: fade-in 0.6s ease-out both;
-  --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  @keyframes fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
+/* Light: cool paper, cobalt signal */
 :root {
-  --radius: 0.75rem;
+  --radius: 0.875rem;
 
-  --ink: #000000;
-  --paper: #f2f0eb;
-  --panel: #ffffff;
-  --line: #dedad0;
-  --text: #14130f;
-  --muted-text: #6b6862;
-  --panel-shadow: 0 12px 32px -14px rgba(20, 19, 15, 0.18), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
-  --panel-shadow-hover: 0 20px 44px -16px rgba(20, 19, 15, 0.26), 0 1px 0 rgba(255, 255, 255, 0.7) inset;
-  --teal: #0d9488;
-  --gold: #a16207;
-
-  /* Fixed (non theme-swapping) references for the theme-toggle eclipse transition */
-  --eclipse-bg-dark: #07080d;
-  --eclipse-bg-light: #f2f0eb;
-  --eclipse-glow-dark: #2dd4bf;
-  --eclipse-glow-light: #a16207;
-
-  --background: var(--paper);
-  --foreground: var(--text);
-  --card: var(--panel);
-  --card-foreground: var(--text);
-  --popover: var(--panel);
-  --popover-foreground: var(--text);
-  --primary: var(--text);
-  --primary-foreground: var(--paper);
-  --secondary: var(--panel);
-  --secondary-foreground: var(--text);
-  --muted: color-mix(in srgb, var(--line) 55%, var(--paper));
-  --muted-foreground: var(--muted-text);
-  --accent: var(--panel);
-  --accent-foreground: var(--text);
-  --destructive: #a3311f;
-  --destructive-foreground: #f2f0eb;
-  --border: var(--line);
-  --input: var(--line);
-  --ring: var(--text);
-}
-
-.dark {
-  --ink: #07080d;
-  --paper: #f2f0eb;
-  --panel: #161822;
-  --line: #2c2f3c;
-  --text: #f2f0eb;
-  --muted-text: #8b8d99;
-  --panel-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
-  --panel-shadow-hover: 0 20px 44px -16px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
-  --teal: #2dd4bf;
-  --gold: #e8b84b;
+  --ink: #f4f5f9;
+  --raised: #eceef5;
+  --panel: #fbfbfd;
+  --line: #dde0ea;
+  --line-strong: #bcc2d4;
+  --text: #0a0c18;
+  --muted-text: #50566e;
+  --signal: #2f4bd8;
+  --glow: #0a7fa8;
+  --pulse: #6d3fe0;
+  --ember: #cf4a14;
+  --panel-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 24px 48px -32px rgba(20, 28, 70, 0.28);
 
   --background: var(--ink);
   --foreground: var(--text);
@@ -126,17 +75,40 @@
   --popover-foreground: var(--text);
   --primary: var(--text);
   --primary-foreground: var(--ink);
-  --secondary: var(--panel);
+  --secondary: var(--raised);
   --secondary-foreground: var(--text);
-  --muted: color-mix(in srgb, var(--line) 70%, var(--ink));
+  --muted: var(--raised);
   --muted-foreground: var(--muted-text);
-  --accent: var(--panel);
+  --accent: var(--raised);
   --accent-foreground: var(--text);
-  --destructive: #e05a43;
-  --destructive-foreground: var(--ink);
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
   --border: var(--line);
-  --input: var(--line);
-  --ring: var(--text);
+  --input: var(--line-strong);
+  --ring: var(--signal);
+
+  color-scheme: light;
+}
+
+/* Dark: deep ink, electric signal */
+.dark {
+  --ink: #06070d;
+  --raised: #0b0d17;
+  --panel: #0d101c;
+  --line: #1b2033;
+  --line-strong: #2c3453;
+  --text: #e9ebf4;
+  --muted-text: #8d93ab;
+  --signal: #7c9cff;
+  --glow: #7fe3ff;
+  --pulse: #b39dff;
+  --ember: #ff8a4c;
+  --panel-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 32px 64px -40px rgba(0, 0, 0, 0.9);
+
+  --destructive: #ff6b5b;
+  --destructive-foreground: var(--ink);
+
+  color-scheme: dark;
 }
 
 @layer base {
@@ -144,61 +116,213 @@
     @apply border-border outline-ring/50;
   }
   html {
-    @apply scroll-smooth;
+    overflow-x: hidden;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    overflow-x: hidden;
+    overflow-x: clip;
+    text-rendering: optimizeLegibility;
   }
   h1,
   h2,
   h3,
-  h4,
-  h5,
-  h6 {
+  h4 {
     @apply font-heading;
+    text-wrap: balance;
   }
   ::selection {
-    background: var(--text);
-    color: var(--background);
+    background: var(--signal);
+    color: var(--ink);
   }
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+  }
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* View-transition theme swap: a circle grows from the toggle */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .container-page {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+  @media (min-width: 1536px) {
+    .container-page {
+      max-width: 1360px;
+    }
   }
 
-  .glass-panel {
-    background-color: color-mix(in srgb, var(--card) 82%, transparent);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border: 1px solid var(--border);
+  .text-gradient-signal {
+    background-image: linear-gradient(100deg, var(--signal) 10%, var(--glow) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .surface {
+    background-color: color-mix(in srgb, var(--panel) 78%, transparent);
+    border: 1px solid var(--line);
     box-shadow: var(--panel-shadow);
-    transition:
-      box-shadow 0.3s ease,
-      border-color 0.3s ease,
-      transform 0.3s ease;
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
   }
 
-  .glass-panel-hover:hover {
-    border-color: var(--foreground);
-    box-shadow: var(--panel-shadow-hover);
-    transform: translateY(-3px);
+  .hairline-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, var(--line) 70%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--line) 70%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 55%, transparent);
+  }
+
+  /* SplitText line masks need room for descenders */
+  .split-mask {
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
   }
 }
 
-html.custom-cursor,
-html.custom-cursor * {
-  cursor: none !important;
+/* The environment behind everything: two soft, static glows in the palette */
+.latent-backdrop {
+  background:
+    radial-gradient(55% 45% at 82% 12%, color-mix(in srgb, var(--signal) 9%, transparent), transparent 70%),
+    radial-gradient(45% 40% at 8% 92%, color-mix(in srgb, var(--pulse) 7%, transparent), transparent 70%);
+}
+.dark .latent-backdrop {
+  background:
+    radial-gradient(55% 45% at 82% 12%, color-mix(in srgb, var(--signal) 13%, transparent), transparent 70%),
+    radial-gradient(45% 40% at 8% 92%, color-mix(in srgb, var(--pulse) 10%, transparent), transparent 70%);
 }
 
-html.custom-cursor input,
-html.custom-cursor textarea {
-  cursor: text !important;
+/* About bio: each word mixes from muted to full text as it is read */
+.lit-word {
+  color: color-mix(in srgb, var(--text) calc(var(--lit, 1) * 100%), var(--muted-text));
+}
+.text-signal .lit-word {
+  color: var(--signal);
+}
+
+/* Film grain: one fixed layer, static, costs nothing per frame */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.dark .grain {
+  opacity: 0.07;
+}
+/* Grain is a large-screen nicety; phones skip the full-viewport filter paint */
+@media (max-width: 767px), (pointer: coarse) {
+  .grain {
+    display: none;
+  }
+}
+
+/* Dashed wires that flow when their card is hovered or focused */
+@keyframes wire-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+.wire-flow {
+  stroke-dasharray: 3 5;
+}
+.group:hover .wire-flow,
+.group:focus-within .wire-flow {
+  animation: wire-flow 0.9s linear infinite;
+}
+
+@keyframes field-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes live-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.live-ping {
+  animation: live-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  animation-delay: -0.8s;
+}
+
+@keyframes cue-drop {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(100%);
+  }
+}
+.cue-drop {
+  animation: cue-drop 2.2s var(--ease-in-out-quart) infinite;
+}
+
+/* Pause every loop on hidden tabs; animation-play-state is not inherited */
+body.tab-hidden *,
+body.tab-hidden *::before,
+body.tab-hidden *::after {
+  animation-play-state: paused !important;
+}
+
+@media (pointer: coarse) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
   }
 }
