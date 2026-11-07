@@ -62,7 +62,7 @@ export function Hero() {
 
       const lines = lineRefs.current.filter(Boolean)
       const sample = sampleName(lines, stageRef.current, {
-        maxCount: window.innerWidth >= 1280 ? 9000 : 6000,
+        maxCount: window.innerWidth >= 1280 ? 9000 : window.innerWidth >= 768 ? 6000 : 4500,
       })
       setNameSample(sample)
       setMode(sample ? "particles" : "dom")
@@ -283,7 +283,7 @@ export function Hero() {
           <p
             ref={leadRef}
             data-intro
-            className="font-heading text-lg font-medium text-muted-foreground sm:text-xl md:text-2xl"
+            className="font-heading text-lg font-medium text-muted-foreground text-center sm:text-left sm:text-xl md:text-2xl"
           >
             {site.leadIn}
           </p>
@@ -291,10 +291,10 @@ export function Hero() {
           <h1
             ref={nameRef}
             className={cn(
-              "mt-3 font-display font-bold tracking-[-0.045em] uppercase",
+              "mt-3 font-display font-bold tracking-[-0.045em] uppercase flex flex-col items-center sm:items-start text-center sm:text-left",
               ghostName ? "text-transparent selection:text-foreground" : "text-foreground"
             )}
-            style={{ fontSize: "clamp(2.4rem, 10.2vw, 9.6rem)", lineHeight: 0.84 }}
+            style={{ fontSize: "clamp(1.85rem, 8.2vw, 9.6rem)", lineHeight: 0.88 }}
           >
             <span
               ref={(el) => {
@@ -308,7 +308,7 @@ export function Hero() {
               </span>
               <span data-baseline aria-hidden className="inline-block h-0 w-0 align-baseline" />
             </span>
-            <span className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-8">
+            <span className="flex flex-col items-center sm:flex-row sm:items-end gap-3 sm:gap-8 mt-1.5 sm:mt-0">
               <span
                 ref={(el) => {
                   if (el) lineRefs.current[1] = el
@@ -325,11 +325,11 @@ export function Hero() {
 
               <span
                 aria-hidden
-                className="flex min-h-[2.5em] items-start gap-4 pb-[0.2em] font-heading sm:min-h-0 sm:items-center text-xl font-medium tracking-normal text-foreground normal-case sm:pb-[0.35em] sm:text-2xl lg:text-3xl"
+                className="flex min-h-[2em] items-center justify-center sm:justify-start gap-3 pb-[0.2em] font-heading sm:min-h-0 text-lg sm:text-2xl lg:text-3xl font-medium tracking-normal text-foreground normal-case sm:pb-[0.35em]"
                 style={{ lineHeight: 1.2 }}
               >
                 <span ref={ruleRef} data-intro className="hidden h-px w-14 origin-left bg-line-strong sm:block" />
-                <span ref={roleRef} data-intro className="sm:whitespace-nowrap">
+                <span ref={roleRef} data-intro className="whitespace-nowrap">
                   {site.roles[0]}
                 </span>
               </span>
@@ -337,7 +337,7 @@ export function Hero() {
           </h1>
           <p className="sr-only">{site.roles.join(", ")}.</p>
 
-          <div ref={copyRef} className="mt-8 sm:mt-10">
+          <div ref={copyRef} className="mt-8 flex flex-col items-center sm:items-start text-center sm:text-left sm:mt-10">
             <p
               ref={taglineRef}
               data-intro
@@ -346,7 +346,7 @@ export function Hero() {
               {site.tagline.lead} — <span className="text-foreground">{site.tagline.rest}</span>
             </p>
 
-            <div ref={actionsRef} data-intro className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+            <div ref={actionsRef} data-intro className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
               <PillButton onClick={() => scrollToId("projects")}>View My Work</PillButton>
               <PillButton variant="ghost" onClick={() => scrollToId("connect")}>
                 Let&apos;s Connect

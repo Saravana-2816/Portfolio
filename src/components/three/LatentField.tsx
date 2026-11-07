@@ -29,7 +29,7 @@ function gaussian(random: () => number) {
  * The cloud reads as an embedding space: most points gather in a handful of
  * soft clusters, the rest drift loose between them.
  */
-function buildGeometry(ambientCount: number, width: number, height: number) {
+function buildGeometry(ambientCount: number, width: number, height: number, _version?: number) {
   const name = field.name
   const nameCount = name?.count ?? 0
   const total = nameCount + ambientCount
@@ -42,11 +42,15 @@ function buildGeometry(ambientCount: number, width: number, height: number) {
   const isName = new Float32Array(total)
   const span = new Float32Array(total)
 
+  // Bounds tailored to viewport aspect ratio so ambient particles stay in view on mobile
+  const xSpan = Math.max(width * 1.5, R * 0.8)
+  const ySpan = Math.max(height * 1.35, R * 0.8)
+
   const clusters = Array.from({ length: 9 }, () => [
-    (random() - 0.5) * R * 1.5,
-    (random() - 0.5) * R * 0.8,
-    -R * 1.1 + random() * R * 1.35,
-    R * (0.07 + random() * 0.1),
+    (random() - 0.5) * xSpan * 0.85,
+    (random() - 0.5) * ySpan * 0.75,
+    -R * 0.9 + random() * R * 1.25,
+    Math.min(width, height) * (0.10 + random() * 0.14),
   ])
 
   for (let i = 0; i < total; i++) {
@@ -56,12 +60,12 @@ function buildGeometry(ambientCount: number, width: number, height: number) {
     if (random() < 0.62) {
       const [cx, cy, cz, spread] = clusters[Math.floor(random() * clusters.length)]
       x = cx + gaussian(random) * spread
-      y = cy + gaussian(random) * spread * 0.8
+      y = cy + gaussian(random) * spread * 0.85
       z = cz + gaussian(random) * spread
     } else {
-      x = (random() - 0.5) * R * 2.2
-      y = (random() - 0.5) * R * 1.3
-      z = -R * 1.4 + random() * R * 1.9
+      x = (random() - 0.5) * xSpan
+      y = (random() - 0.5) * ySpan
+      z = -R * 1.2 + random() * R * 1.6
     }
     scatter[i * 3] = x
     scatter[i * 3 + 1] = y
@@ -119,13 +123,12 @@ function Field({ theme }: { theme: Theme }) {
 
   React.useEffect(() => onNameSample(() => setNameVersion(field.nameVersion)), [])
 
-  const ambientCount = size.width < 768 ? 1400 : size.width < 1280 ? 2600 : 3400
+  const ambientCount = size.width < 768 ? 1200 : size.width < 1280 ? 2400 : 3200
 
-  // Rebuild only when the sampled name changes or the viewport class changes.
+  // Rebuild when the sampled name, ambient particle budget, or viewport dimensions change.
   const geometry = React.useMemo(
-    () => buildGeometry(ambientCount, size.width, size.height),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [nameVersion, ambientCount]
+    () => buildGeometry(ambientCount, size.width, size.height, nameVersion),
+    [nameVersion, ambientCount, size.width, size.height]
   )
   React.useEffect(() => () => geometry.dispose(), [geometry])
 
@@ -151,6 +154,7 @@ function Field({ theme }: { theme: Theme }) {
           uEmber: { value: new THREE.Color(PALETTES[theme].ember) },
           uDust: { value: new THREE.Color(PALETTES[theme].dust) },
           uDark: { value: theme === "dark" ? 1 : 0 },
+          uNameParticleScale: { value: 1 },
         },
       }),
     // Theme changes are eased in the frame loop, not by rebuilding.
@@ -191,10 +195,11 @@ function Field({ theme }: { theme: Theme }) {
     const distance = size.height / (2 * Math.tan(THREE.MathUtils.degToRad(FOV / 2)))
     const eased = easeInOut(Math.min(1, s.burst))
 
+    u.uNameParticleScale.value = size.width < 768 ? 1.45 : 1.0
     u.uTime.value = state.clock.elapsedTime
     u.uIntro.value = field.intro
     u.uBurst.value = s.burst
-    u.uFade.value = 1 - 0.55 * THREE.MathUtils.smoothstep(s.burst, 0.55, 1)
+    u.uFade.value = 1 - 0.22 * THREE.MathUtils.smoothstep(s.burst, 0.55, 1)
     u.uPixelRatio.value = gl.getPixelRatio()
     u.uDistance.value = distance
     u.uPointer.value.set(s.px, s.py, s.pz)
@@ -206,9 +211,9 @@ function Field({ theme }: { theme: Theme }) {
     ;(u.uDust.value as THREE.Color).lerp(targets.dust, tk)
     u.uDark.value += (targets.dark - u.uDark.value) * tk
 
-    // Fly the camera into the cloud as the hero scrolls away.
+    // Fly the camera smoothly into the cloud as the hero scrolls away, keeping particles in view across sections
     const parallax = 1 - eased
-    camera.position.set(s.px * 0.018 * parallax, s.py * 0.018 * parallax, distance * (1 - 0.74 * eased))
+    camera.position.set(s.px * 0.018 * parallax, s.py * 0.018 * parallax, distance * (1 - 0.48 * eased))
     camera.lookAt(camera.position.x * 0.4, camera.position.y * 0.4, -distance)
     ;(camera as THREE.PerspectiveCamera).far = distance * 4
     camera.updateProjectionMatrix()
