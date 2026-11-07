@@ -17,9 +17,9 @@ export function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches
 }
 
-/** The particle name needs room and a GPU; phones get the crisp DOM name instead. */
+/** The particle name is enabled whenever WebGL is available and reduced motion is off. */
 export function canRenderParticleName() {
-  return !prefersReducedMotion() && hasWebGL() && window.innerWidth >= 768
+  return !prefersReducedMotion() && hasWebGL()
 }
 
 export function isFinePointer() {

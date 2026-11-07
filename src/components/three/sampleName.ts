@@ -69,14 +69,16 @@ export function sampleName(
 
   if (!Number.isFinite(minX) || fontSize === 0) return null
 
+  const isMobile = vw < 768
   const x0 = Math.max(0, Math.floor(minX) - 4)
   const x1 = Math.min(vw, Math.ceil(maxX) + 4)
   const y0 = Math.max(0, Math.floor(minY) - 4)
   const y1 = Math.min(vh, Math.ceil(maxY) + 4)
   const data = ctx.getImageData(0, 0, vw, vh).data
+  const threshold = isMobile ? 120 : 150
 
-  // Wide enough that each point reads as a point: a dot matrix, not a fill.
-  let gap = Math.max(3, Math.round(fontSize / 34))
+  // Adaptive sampling resolution: tighter gap on mobile so glyphs have dense, clear contours
+  let gap = isMobile ? 2 : Math.max(3, Math.round(fontSize / 34))
   let hits: number[] = []
 
   // Widen the grid until the count fits the budget.
@@ -84,7 +86,7 @@ export function sampleName(
     hits = []
     for (let y = y0; y < y1; y += gap) {
       for (let x = x0; x < x1; x += gap) {
-        if (data[(y * vw + x) * 4 + 3] > 150) hits.push(x, y)
+        if (data[(y * vw + x) * 4 + 3] > threshold) hits.push(x, y)
       }
     }
     if (hits.length / 2 <= maxCount || gap > 8) break
@@ -96,15 +98,33 @@ export function sampleName(
   const spans = new Float32Array(count)
   const random = rng(20040928)
   const width = Math.max(1, maxX - minX)
-  const jitter = gap * 0.32
+
+  // Reduced jitter on mobile keeps particles firmly on the letter strokes
+  const jitter = isMobile ? gap * 0.16 : gap * 0.32
+
+  // Center of the sampled name bounding box
+  const nameCenterX = (minX + maxX) / 2
+  const nameCenterY = (minY + maxY) / 2
+
+  // Calculate safe rendering scale in Three.js so particle-name has increased visual size
+  // without exceeding viewport width or causing clipping/horizontal overflow
+  const maxAllowedWidth = vw - 32
+  const targetScale = isMobile ? 1.15 : 1.0
+  const renderScale = isMobile && width * targetScale > maxAllowedWidth
+    ? Math.max(1.0, maxAllowedWidth / width)
+    : targetScale
 
   for (let i = 0; i < count; i++) {
-    const px = hits[i * 2] + (random() - 0.5) * jitter
-    const py = hits[i * 2 + 1] + (random() - 0.5) * jitter
+    const rawPx = hits[i * 2] + (random() - 0.5) * jitter
+    const rawPy = hits[i * 2 + 1] + (random() - 0.5) * jitter
+
+    const px = nameCenterX + (rawPx - nameCenterX) * renderScale
+    const py = nameCenterY + (rawPy - nameCenterY) * renderScale
+
     positions[i * 3] = px - vw / 2
     positions[i * 3 + 1] = vh / 2 - py
     positions[i * 3 + 2] = 0
-    spans[i] = (px - minX) / width
+    spans[i] = (rawPx - minX) / width
   }
 
   return { positions, spans, count, viewportWidth: vw, viewportHeight: vh }

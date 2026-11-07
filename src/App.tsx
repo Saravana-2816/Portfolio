@@ -18,30 +18,17 @@ import { markFieldReady } from "@/components/three/fieldState"
 
 const LatentField = React.lazy(() => import("@/components/three/LatentField"))
 
-const WAKE_EVENTS = ["pointerdown", "touchstart", "wheel", "scroll", "keydown"] as const
-
 function Backdrop() {
   const { theme } = useTheme()
   const [enabled] = React.useState(() => hasWebGL() && !prefersReducedMotion())
-  // Wide screens need the field for the particle name, so it loads right away.
-  const [load, setLoad] = React.useState(() => enabled && window.innerWidth >= 768)
+  const [load] = React.useState(() => enabled)
 
   React.useEffect(() => {
     // Without a field, nothing will ever mark it ready; let the hero proceed.
     if (!enabled) {
       markFieldReady()
-      return
     }
-    if (load) return
-    // Phones only get the ambient cloud: wait for the visitor's first move so the
-    // 3D chunk never competes with the first paint.
-    const wake = () => {
-      WAKE_EVENTS.forEach((e) => window.removeEventListener(e, wake))
-      setLoad(true)
-    }
-    WAKE_EVENTS.forEach((e) => window.addEventListener(e, wake, { passive: true }))
-    return () => WAKE_EVENTS.forEach((e) => window.removeEventListener(e, wake))
-  }, [enabled, load])
+  }, [enabled])
 
   return (
     <>

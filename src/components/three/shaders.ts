@@ -12,6 +12,7 @@ uniform vec3 uGlow;
 uniform vec3 uEmber;
 uniform vec3 uDust;
 uniform float uDark;
+uniform float uNameParticleScale;
 
 attribute vec3 aScatter;
 attribute vec4 aRand;
@@ -41,7 +42,7 @@ void main() {
   float c = cos(ang);
   float s = sin(ang);
   sc.xz = vec2(c * sc.x - s * sc.z, s * sc.x + c * sc.z);
-  sc.y += sin(uTime * 0.22 + aRand.w * 6.2831) * 16.0;
+  sc.y += sin(uTime * 0.24 + aRand.w * 6.2831) * 18.0;
 
   // Resting name particles breathe instead of sitting still.
   vec3 home = position;
@@ -66,24 +67,32 @@ void main() {
   gl_Position = projectionMatrix * mv;
 
   float depth = -mv.z;
-  float baseSize = mix(1.4 + aRand.z * 2.0, 2.6 + aRand.z * 1.1, aName);
-  gl_PointSize = clamp(baseSize * uDistance / max(depth, 1.0), 0.0, 42.0) * uPixelRatio;
+  float ambientBase = 2.2 + aRand.z * 2.4;
+  float nameBase = (3.5 + aRand.z * 1.6) * uNameParticleScale;
+  float baseSize = mix(ambientBase, nameBase, aName);
+  gl_PointSize = clamp(baseSize * uDistance / max(depth, 1.0), 1.5, 52.0) * uPixelRatio;
 
+  // Blue and cyan gradient across name letters with sparkling bright particles
   vec3 nameColor = mix(uSignal, uGlow, smoothstep(0.05, 1.0, aSpan));
-  nameColor = mix(nameColor, vec3(1.0), step(0.94, aRand.w) * uDark * 0.55);
+  nameColor = mix(nameColor, vec3(1.0), step(0.92, aRand.w) * uDark * 0.6);
 
-  vec3 dustColor = mix(uDust, uSignal, step(0.62, aRand.w));
-  dustColor = mix(dustColor, uGlow, step(0.88, aRand.w));
-  dustColor = mix(dustColor, uEmber, step(0.978, aRand.w));
+  // Vibrant blue and cyan palette for ambient background particles
+  vec3 dustColor = mix(uSignal, uGlow, aRand.w);
+  // Add crisp luminous highlights
+  dustColor = mix(dustColor, vec3(0.92, 0.96, 1.0), step(0.88, aRand.x) * 0.45);
+  // Subtle dust tint on a few background points
+  dustColor = mix(dustColor, uDust, step(0.75, aRand.z) * 0.3);
+  // Rare warm ember accent (1.5%)
+  dustColor = mix(dustColor, uEmber, step(0.985, aRand.y));
 
   float nameMix = aName * ti * (1.0 - tb * 0.55);
   vColor = mix(dustColor, nameColor, nameMix);
 
   float nearFade = smoothstep(30.0, 240.0, depth);
-  float farFade = 1.0 - smoothstep(uDistance * 2.3, uDistance * 3.4, depth);
-  float dustAlpha = (0.22 + aRand.z * 0.45) * mix(0.9, 1.25, uDark);
+  float farFade = 1.0 - smoothstep(uDistance * 2.5, uDistance * 3.8, depth);
+  float dustAlpha = (0.44 + aRand.z * 0.48) * mix(0.95, 1.35, uDark);
   float a = mix(dustAlpha, 1.0, nameMix);
-  a *= 0.78 + 0.22 * sin(uTime * (0.7 + aRand.x * 1.5) + aRand.y * 6.2831);
+  a *= 0.82 + 0.18 * sin(uTime * (0.6 + aRand.x * 1.2) + aRand.y * 6.2831);
 
   vAlpha = a * nearFade * farFade * mix(uFade, 1.0, assembled);
 }
@@ -96,11 +105,11 @@ varying float vAlpha;
 
 void main() {
   float d = length(gl_PointCoord - 0.5);
-  // A crisp disc so small points stay bright, plus a faint halo in the dark theme.
-  float core = 1.0 - smoothstep(0.3, 0.5, d);
-  float halo = (1.0 - smoothstep(0.0, 0.5, d)) * 0.35 * uDark;
+  // Crisp disc so particles stay clearly defined, plus radiant halo in dark theme
+  float core = 1.0 - smoothstep(0.36, 0.5, d);
+  float halo = (1.0 - smoothstep(0.0, 0.5, d)) * 0.55 * uDark;
   float a = max(core, halo) * vAlpha;
-  if (a < 0.012) discard;
+  if (a < 0.01) discard;
   gl_FragColor = vec4(vColor, a);
 }
 `
